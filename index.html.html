@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<!-- saved from url=(0054)file:///C:/Users/c737523/Downloads/semaforo_v5_18.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semáforo Ecommerce — GDN</title>
+<link href="./Semáforo Ecommerce — GDN_files/css2" rel="stylesheet">
+<style>
+:root{
+  --bg:#151B2B;--surface:#1C2338;--surface2:#232B42;--border:#303A58;
+  --text:#F0F4FF;--muted:#8896BB;
+  --green:#1EDD84;--green-glow:rgba(30,221,132,.3);
+  --yellow:#FFD000;--yellow-glow:rgba(255,208,0,.3);
+  --red:#FF4444;--red-glow:rgba(255,68,68,.3);
+  --blue:#5BABFF;--blue-glow:rgba(91,171,255,.25);
+  --orange:#FF9A50;
+  --navy:#0D1B2A;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);background-attachment:fixed;color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+.topbar{padding:12px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,#0D1420 0%,#131927 100%);box-shadow:0 2px 12px rgba(0,0,0,.4);}
+.brand{font-family:'Inter',sans-serif;font-size:15px;font-weight:700;letter-spacing:.01em;color:var(--text);display:flex;align-items:center;gap:6px;}
+.brand-logo{width:28px;height:28px;border-radius:7px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;font-family:'Inter',sans-serif;flex-shrink:0;}
+.brand-dot{color:var(--muted);font-weight:400;margin:0 1px;}
+.brand span{color:var(--muted);font-weight:400;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.clock{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);}
+.btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.btn:hover{border-color:var(--green);color:var(--green);}
+.btn.blue:hover{border-color:var(--blue);color:var(--blue);}
+.btn.orange:hover{border-color:var(--orange);color:var(--orange);}
+input[type=file]{display:none;}
+
+/* BARRA KPI EJECUTIVA */
+.kpi-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);}
+.kpi-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;display:flex;flex-direction:column;gap:2px;}
+.kpi-card-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text);font-weight:600;}
+.kpi-card-val{font-family:'DM Mono',monospace;font-size:22px;font-weight:700;line-height:1.1;}
+.kpi-card-sub{font-size:11px;color:var(--muted);}
+.kpi-card.yellow{border-color:var(--yellow);}
+.kpi-card.yellow .kpi-card-val{color:var(--yellow);}
+.kpi-card.green{border-color:var(--green);}
+.kpi-card.green .kpi-card-val{color:var(--green);}
+.kpi-card.red{border-color:var(--red);}
+.kpi-card.red .kpi-card-val{color:var(--red);}
+.kpi-card.blue{border-color:var(--blue);}
+.kpi-card.blue .kpi-card-val{color:var(--blue);}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:220px 1fr;flex:1;min-height:0;}
+
+/* LEFT PANEL */
+.left{background:#111827;border-right:1px solid var(--border);padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;overflow-y:auto;}
+
+/* TOTAL PENDIENTES HERO */
+.pending-hero{width:100%;background:var(--surface2);border:1.5px solid var(--yellow);border-radius:12px;padding:10px 14px;text-align:center;}
+.pending-hero-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--yellow);margin-bottom:4px;}
+.pending-hero-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:var(--yellow);line-height:1;}
+.pending-hero-sub{font-size:9px;color:var(--muted);margin-top:3px;}
+
+.semaforo-big{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:14px;width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.sem-title{font-size:13px;font-weight:800;color:var(--text)!important;letter-spacing:.02em;margin-bottom:2px;text-transform:uppercase;}
+.sem-row{display:flex;align-items:center;gap:12px;width:100%;}
+.light-big{width:44px;height:44px;border-radius:50%;background:#0D1120;border:3px solid #252D42;flex-shrink:0;transition:all .4s;}
+.light-big.on-red{background:var(--red);border-color:var(--red);box-shadow:0 0 20px var(--red-glow),0 0 40px var(--red-glow);}
+.light-big.on-yellow{background:var(--yellow);border-color:var(--yellow);box-shadow:0 0 20px var(--yellow-glow),0 0 40px var(--yellow-glow);}
+.light-big.on-green{background:var(--green);border-color:var(--green);box-shadow:0 0 20px var(--green-glow),0 0 40px var(--green-glow);}
+.sem-info{flex:1;}
+.sem-label{font-size:11px;font-weight:800;color:var(--text)!important;text-transform:uppercase;letter-spacing:.06em;}
+.sem-sub{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;margin-top:3px;}
+.sem-sub.red{color:var(--red);}
+.sem-sub.yellow{color:var(--yellow);}
+.sem-sub.green{color:var(--green);}
+.ontime-global-pct{font-size:32px;font-weight:900;letter-spacing:-1.5px;line-height:1;text-align:center;padding:8px 0 4px;}
+
+.divider{width:100%;height:1px;background:var(--border);}
+
+.kpi-list{width:100%;display:flex;flex-direction:column;gap:4px;}
+.kpi-row{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:6px;background:var(--surface2);}
+.kpi-label{font-size:10px;color:var(--muted);}
+.kpi-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;}
+.kpi-val.white{color:var(--text);}
+.kpi-val.green{color:var(--green);}
+.kpi-val.yellow{color:var(--yellow);}
+.kpi-val.red{color:var(--red);}
+.kpi-val.blue{color:var(--blue);}
+.kpi-val.orange{color:var(--orange);}
+
+/* FACTURACIÓN CARD */
+.money-card{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+.money-title{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.money-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.money-label{font-size:10px;color:var(--muted);}
+.money-val{font-family:'DM Mono',monospace;font-size:12px;color:var(--text);}
+.money-val.green{color:var(--green);}
+.money-val.blue{color:var(--blue);}
+.money-val.yellow{color:var(--yellow);}
+.money-val.red{color:var(--red);}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:99px;margin-top:6px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:99px;background:var(--green);transition:width .5s;}
+
+/* RIGHT PANEL */
+.right{display:flex;flex-direction:column;overflow:hidden;}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);}
+.tab{padding:10px 16px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-1px;}
+.tab.active{color:var(--text);border-bottom-color:var(--green);}
+.tab-body{flex:1;overflow-y:auto;padding:14px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* FILTERS */
+.filter-row{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.fbtn{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:99px;font-size:11px;cursor:pointer;transition:all .15s;}
+.fbtn:hover,.fbtn.active{color:var(--text);border-color:var(--text);}
+.fbtn.active{background:var(--text);color:var(--bg);}
+/* FILTROS COMPACTOS */
+.filter-select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s;}
+.filter-select:hover,.filter-select:focus{border-color:var(--blue);}
+.filter-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.filter-group{display:flex;align-items:center;gap:6px;}
+.sec-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px;}
+
+/* STORE GRID */
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;}
+.store-card{background:#1C2338;border:1px solid #303A58;border-radius:10px;padding:12px;transition:border-color .2s;color:var(--text)!important;}
+.store-card *{color:inherit;}
+.store-card .card-name{color:var(--text)!important;font-size:13px;font-weight:600;letter-spacing:.01em;}
+.store-card .card-num{color:var(--muted)!important;font-family:'DM Mono',monospace;font-size:11px;}
+.store-card .card-num span{color:var(--text)!important;font-weight:600;}
+.store-card .cstat-l{color:var(--muted)!important;font-size:9px;text-transform:uppercase;}
+.store-card .ontime-label{color:var(--muted)!important;}
+.store-card .cstat-v{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--text)!important;}
+.store-card .cstat-v.white{color:var(--text)!important;}
+.store-card .cstat-v.dim{color:var(--muted)!important;}
+.store-card .cstat-v.green{color:var(--green)!important;}
+.store-card .cstat-v.yellow{color:var(--yellow)!important;}
+.store-card .cstat-v.red{color:var(--red)!important;}
+.store-card .cstat-v.blue{color:var(--blue)!important;}
+.store-card .cstat-v.orange{color:var(--orange)!important;}
+.store-card.alert{border-color:var(--red);}
+.store-card.alert-yellow{border-color:var(--yellow);}
+.store-card.alert-green{border-color:var(--green);}
+.store-card:hover{border-color:var(--muted);}
+.card-name,.card-num,.cstat-l,.cstat-v,.ontime-label,.ontime-pct{color:inherit;}
+.cstat-v.white{color:var(--text)!important;}
+.cstat-v.dim{color:var(--muted)!important;}
+.cstat-v.green{color:var(--green)!important;}
+.cstat-v.yellow{color:var(--yellow)!important;}
+.cstat-v.red{color:var(--red)!important;}
+.cstat-v.blue{color:var(--blue)!important;}
+.cstat-v.orange{color:var(--orange)!important;}
+
+.card-top{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+.semaforo-mini{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:6px 7px;display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;}
+.light-mini{width:14px;height:14px;border-radius:50%;background:#2E2E2E;border:1.5px solid #3A3A3A;transition:all .3s;}
+.light-mini.on-red{background:var(--red);border-color:var(--red);box-shadow:0 0 5px var(--red-glow);}
+.light-mini.on-yellow{background:var(--yellow);border-color:var(--yellow);box-shadow:0 0 5px var(--yellow-glow);}
+.light-mini.on-green{background:var(--green);border-color:var(--green);box-shadow:0 0 5px var(--green-glow);}
+
+.card-info{flex:1;min-width:0;}
+.card-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);margin-bottom:3px;}
+.card-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:5px;}
+.card-num span{color:var(--text);font-weight:500;}
+
+/* PENDIENTES BADGE EN CARD */
+.card-pending{display:inline-flex;align-items:center;gap:4px;background:rgba(245,196,0,.12);border:1px solid rgba(245,196,0,.3);border-radius:4px;padding:2px 6px;margin-bottom:6px;}
+.card-pending-label{font-size:9px;color:var(--yellow);}
+.card-pending-val{font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:var(--yellow);}
+
+.ontime-bar{margin-bottom:6px;}
+.ontime-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.ontime-label{font-size:9px;color:var(--muted);}
+.ontime-pct{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;}
+.ontime-track{width:100%;height:4px;background:var(--border);border-radius:99px;overflow:hidden;}
+.ontime-fill{height:100%;border-radius:99px;transition:width .5s;}
+
+.card-stats{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+.cstat{background:var(--bg);border-radius:5px;padding:4px 6px;}
+.cstat-l{font-size:9px;color:var(--muted);text-transform:uppercase;}
+.cstat-v{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;}
+.cstat-v.red{color:var(--red);}
+.cstat-v.yellow{color:var(--yellow);}
+.cstat-v.green{color:var(--green);}
+.cstat-v.blue{color:var(--blue);}
+.cstat-v.orange{color:var(--orange);}
+.cstat-v.dim{color:var(--muted);}
+.alert-tag{background:#3D0F0F;color:var(--red);font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;grid-column:1/-1;}
+.reclamo-tag{background:#0F1A3D;color:var(--blue);font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;grid-column:1/-1;}
+
+/* CARD VENTA + FACTURACION */
+.card-money{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:2px;}
+.card-money-divider{grid-column:1/-1;height:1px;background:var(--border);margin:2px 0;}
+
+/* RECLAMOS */
+.rec-summary{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.rec-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:2px;min-width:120px;}
+.rec-chip-motivo{font-size:10px;color:var(--muted);}
+.rec-chip-cnt{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--red);}
+
+.rec-table{width:100%;border-collapse:collapse;font-size:12px;}
+.rec-table th{text-align:left;padding:7px 10px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);}
+.rec-table td{padding:7px 10px;border-bottom:1px solid var(--border);}
+.rec-table tr:hover td{background:var(--surface2);}
+.tag{display:inline-block;background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:99px;font-size:10px;color:var(--muted);}
+.rec-section-title{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:16px 0 8px;}
+.rec-store-grid{display:flex;flex-direction:column;gap:6px;}
+.rec-store-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.rec-store-summary{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer;user-select:none;gap:8px;}
+.rec-store-summary:hover{background:rgba(255,255,255,.04);}
+.rec-store-detail{padding:0 12px 10px;display:none;}
+.rec-store-detail.open{display:block;}
+.rec-store-chevron{font-size:10px;color:var(--muted);transition:transform .2s;flex-shrink:0;}
+.rec-store-chevron.open{transform:rotate(180deg);}
+.rec-store-name{font-size:12px;font-weight:700;color:var(--text);}
+.rec-store-num{font-size:10px;color:var(--muted);}
+.rec-store-badge{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;}
+.rec-store-badge.coord{background:rgba(59,130,246,.15);color:#60A5FA;}
+.rec-store-badge.fmt{background:rgba(168,85,247,.15);color:#C084FC;}
+.rec-store-total{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--red);margin-left:4px;}
+.rec-store-items{display:flex;flex-direction:column;gap:4px;}
+.rec-store-item{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-top:1px solid var(--border);}
+.rec-store-motivo{font-size:11px;color:var(--text);}
+.rec-store-qty{font-size:11px;font-weight:600;color:var(--muted);min-width:20px;text-align:right;}
+
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;color:var(--muted);text-align:center;gap:8px;}
+.empty-icon{font-size:32px;opacity:.3;}
+.falt-tag{background:#2D1B00;color:var(--orange);font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;grid-column:1/-1;}
+.btn.red:hover{border-color:var(--red);color:var(--red);}
+
+/* MODAL DRILL DOWN */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+.modal-box{background:#1A1F2E;border:1px solid var(--border);border-radius:14px;width:min(700px,95vw);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6);}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.modal-title{font-size:14px;font-weight:600;color:var(--text);}
+.modal-subtitle{font-size:11px;color:var(--muted);margin-top:2px;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1;}
+.modal-close:hover{background:var(--surface2);color:var(--text);}
+.modal-body{overflow-y:auto;padding:0;}
+.modal-table{width:100%;border-collapse:collapse;font-size:12px;}
+.modal-table th{text-align:left;padding:8px 16px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);position:sticky;top:0;background:#1A1F2E;}
+.modal-table td{padding:8px 16px;border-bottom:1px solid rgba(42,48,72,.5);}
+.modal-table tr:hover td{background:rgba(255,255,255,.03);}
+.modal-empty{padding:30px;text-align:center;color:var(--muted);font-size:13px;}
+.cstat.clickable{cursor:pointer;transition:background .15s;}
+.cstat.clickable:hover{background:var(--surface2);border-radius:5px;}
+
+/* MEJORAS TIPOGRÁFICAS SEMÁFORO IZQUIERDO */
+.sem-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.sem-sub{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;margin-top:2px;}
+.semaforo-big{gap:10px;}
+.sem-row{gap:12px;}
+
+.auto-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em;margin-right:6px}
+.auto-badge.loading{background:rgba(255,200,0,.2);color:#FCD34D}
+.auto-badge.live{background:rgba(34,197,94,.2);color:#4ADE80}
+.auto-badge.error{background:rgba(239,68,68,.2);color:#F87171}
+.last-update{font-size:10px;color:#8899BB;margin-right:8px}
+.refresh-btn{font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid #344970;background:#253044;color:#D0DCF0;cursor:pointer}
+.refresh-btn:hover{background:#344970}
+
+.store-card.alert { border: 2px solid var(--red) !important; }
+.store-card.alert-yellow { border: 2px solid var(--yellow) !important; }
+.store-card.alert-green { border: 2px solid var(--green) !important; }
+
+/* Mejoras de contraste y profesionalismo */
+.left .section-title, .estado-title {
+  color: #4D9EFF !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: .15em !important;
+  text-transform: uppercase !important;
+}
+.store-card { box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.store-card:hover { background: #1E2536 !important; border-color: #3A4560 !important; }
+.topbar-right .btn { border-radius: 8px; }
+.layout { gap: 0; }
+.right { background: #0F1117; }
+.tab-bar { background: #0D1120; border-bottom: 1px solid #2A3048; }
+</style>
+</head>
+<body>
+
+
+<div class="topbar">
+  <div class="brand"><div class="brand-logo">M</div>Más Online<span class="brand-dot">·</span><span>Operaciones</span></div>
+  <div class="topbar-right">
+    <span id="autoStatus" class="auto-badge loading">⟳ Conectando…</span><span id="lastUpdate" class="last-update"></span><button class="refresh-btn" onclick="manualRefresh()">↻</button><span class="clock" id="clock">07:34:59</span>
+    <button class="btn orange" onclick="document.getElementById(&#39;ontimeInput&#39;).click()">⏱ On Time</button>
+    <button class="btn blue" onclick="document.getElementById(&#39;factInput&#39;).click()">💰 Facturación</button>
+    <button class="btn blue" onclick="document.getElementById(&#39;rmaInput&#39;).click()">📋 Reclamos</button><span id="rmaManualBadge" title="Datos manuales — clic para limpiar" onclick="clearManualRma()" style="display:none;cursor:pointer;background:#d97706;color:#fff;font-size:9px;padding:2px 5px;border-radius:3px;margin-left:2px;vertical-align:middle">✎ manual ×</span>
+    <button class="btn red" onclick="document.getElementById(&#39;faltInput&#39;).click()">⚠ Faltantes</button><span id="faltManualBadge" title="Datos manuales — clic para limpiar" onclick="clearManualFalt()" style="display:none;cursor:pointer;background:#d97706;color:#fff;font-size:9px;padding:2px 5px;border-radius:3px;margin-left:2px;vertical-align:middle">✎ manual ×</span>
+    <button class="btn" onclick="document.getElementById(&#39;tipoInput&#39;).click()">🚚 Entregas</button>
+    <button class="btn" onclick="document.getElementById(&#39;pedInput&#39;).click()">📂 Pedidos</button>
+    <input type="file" id="pedInput" accept=".xlsx,.csv">
+    <input type="file" id="rmaInput" accept=".xlsx,.csv">
+    <input type="file" id="factInput" accept=".xlsx,.csv">
+    <input type="file" id="ontimeInput" accept=".xlsx,.csv">
+    <input type="file" id="faltInput" accept=".xlsx,.csv">
+    <input type="file" id="tipoInput" accept=".xlsx,.csv">
+  </div>
+</div>
+
+<!-- BARRA SUPERIOR KPI EJECUTIVO -->
+<div class="kpi-bar">
+  <div class="kpi-card blue">
+    <div class="kpi-card-label">📦 Total pedidos</div>
+    <div class="kpi-card-val" id="kTotal">—</div>
+    <div class="kpi-card-sub" id="kTotalSub">—</div>
+  </div>
+  <div class="kpi-card yellow">
+    <div class="kpi-card-label">⏳ Pendientes picking</div>
+    <div class="kpi-card-val" id="kPendientes">—</div>
+    <div class="kpi-card-sub" id="kPendientesSub">sin picker asignado</div>
+  </div>
+  <div class="kpi-card green">
+    <div class="kpi-card-label">💰 Venta del día</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:3px;">
+      <div style="flex:2">
+        <div style="font-size:8px;color:var(--text);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Venta</div>
+        <div class="kpi-card-val" id="kMonto" style="font-size:20px">—</div>
+      </div>
+      <div style="flex:2">
+        <div style="font-size:8px;color:var(--text);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Facturado</div>
+        <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:var(--green)" id="kFactVal">—</div>
+      </div>
+      <div style="flex:1;text-align:right">
+        <div style="font-size:8px;color:var(--text);font-weight:700;text-transform:uppercase;letter-spacing:.06em;">Avance</div>
+        <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:var(--green)" id="kFactPct">—</div>
+        <div style="height:3px;background:var(--border);border-radius:99px;margin-top:3px;overflow:hidden;min-width:50px">
+          <div id="kFactBar" style="height:100%;border-radius:99px;background:var(--green);width:0%;transition:width .5s"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="kpi-card red">
+    <div class="kpi-card-label">❌ Cancelados</div>
+    <div class="kpi-card-val" id="kCanceled">—</div>
+    <div class="kpi-card-sub" id="kCanceladoSub">—</div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="left">
+
+    <!-- SEMÁFORO -->
+    <div class="semaforo-big">
+      <div class="sem-title">🚦 On Time Preparación</div>
+      <div class="sem-row">
+        <div class="light-big on-red" id="lRed"></div>
+        <div class="sem-info">
+          <div class="sem-label">Atrasados</div>
+          <div class="sem-sub red" id="lRedSub">165 pedidos</div>
+        </div>
+      </div>
+      <div class="sem-row">
+        <div class="light-big" id="lYellow"></div>
+        <div class="sem-info">
+          <div class="sem-label">En Picking</div>
+          <div class="sem-sub yellow" id="lYellowSub">58 pedidos</div>
+        </div>
+      </div>
+      <div class="sem-row">
+        <div class="light-big" id="lGreen"></div>
+        <div class="sem-info">
+          <div class="sem-label">A Tiempo</div>
+          <div class="sem-sub green" id="lGreenSub">1425 pedidos</div>
+        </div>
+      </div>
+      <div style="width:100%;border-top:1px solid var(--border);padding-top:10px;text-align:center;">
+        <div id="ontimeGlobalPct" class="ontime-global-pct" style="color:var(--red);">91%</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">on time global</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- KPIs OPERATIVOS -->
+    <div class="kpi-list">
+      <div class="kpi-row"><span class="kpi-label">En picking</span><span class="kpi-val yellow" id="kInPicking">—</span></div>
+      <div class="kpi-row"><span class="kpi-label">Para facturar</span><span class="kpi-val blue" id="kInvoice">—</span></div>
+      <div class="kpi-row"><span class="kpi-label">Para entregar</span><span class="kpi-val orange" id="kReady">—</span></div>
+      <div class="kpi-row"><span class="kpi-label">Entregados</span><span class="kpi-val green" id="kDelivered">—</span></div>
+      <div class="kpi-row"><span class="kpi-label">Fuera franja</span><span class="kpi-val red" id="kDelayed">—</span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- TIPOS DE ENTREGA -->
+    <div class="kpi-list">
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;font-weight:700;">Tipo de entrega</div>
+      <div class="kpi-row"><span class="kpi-label">🚚 Delivery</span><span class="kpi-val white" id="kDelivery">—</span></div>
+      <div class="kpi-row"><span class="kpi-label">🏪 Retiro</span><span class="kpi-val white" id="kPickup">—</span></div>
+      <div class="kpi-row"><span class="kpi-label">🚗 Drive</span><span class="kpi-val white" id="kDrive">—</span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- RECLAMOS Y FALTANTES -->
+    <div class="kpi-list">
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;font-weight:700;">Alertas</div>
+      <div class="kpi-row"><span class="kpi-label">📋 Reclamos</span><span class="kpi-val red" id="kReclamos">—</span></div>
+      <div class="kpi-row"><span class="kpi-label">⚠ Ped. c/faltantes</span><span class="kpi-val red" id="kFaltantes">—</span></div>
+      <div class="kpi-row"><span class="kpi-label">⚠ Items faltantes</span><span class="kpi-val red" id="kItemsFalt">—</span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FACTURACIÓN -->
+    <div class="money-card">
+      <div class="money-title">💰 Facturación</div>
+      <div class="money-row"><span class="money-label">Venta día</span><span class="money-val blue" id="mAFacturar">—</span></div>
+      <div class="money-row"><span class="money-label">Facturado</span><span class="money-val green" id="mHoy">—</span></div>
+      <div class="money-row"><span class="money-label">$ Cancelado</span><span class="money-val red" id="mCancelado">—</span></div>
+      <div class="money-row"><span class="money-label">Avance</span><span class="money-val" id="mPct">—</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="mBar" style="width:0%;background:var(--green);"></div></div>
+    </div>
+
+  </div>
+
+  <div class="right">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(&#39;tiendas&#39;)">Tiendas</div>
+      <div class="tab" onclick="switchTab(&#39;reclamos&#39;)">Reclamos</div>
+    </div>
+    <div class="tab-body">
+      <div class="tab-panel active" id="tab-tiendas">
+        <div class="filter-row" id="filterRow">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%;">
+      <div class="filter-group"><span class="filter-label">Ver</span>
+        <select class="filter-select" onchange="setView(this.value)">
+          <option value="formato" selected>Por formato</option>
+          <option value="coord">Por coordinador</option>
+          <option value="tiendas">Por tienda</option>
+        </select>
+      </div>
+      <div class="filter-group"><span class="filter-label">Estado</span>
+        <select class="filter-select" onchange="setFilter(this.value)">
+          <option value="all" selected>Todas</option>
+          <option value="attention">🔴 Atrasados</option>
+          <option value="pendientes">📦 Pendientes</option>
+          <option value="reclamos">📋 Reclamos</option>
+          <option value="delivered">✅ Entregados</option>
+        </select>
+      </div>
+      <div class="filter-group"><span class="filter-label">Formato</span>
+        <select class="filter-select" onchange="setFormato(this.value)">
+          <option value="all" selected>Todos</option>
+          <option value="Full 1">Full 1</option>
+          <option value="Full 2">Full 2</option>
+          <option value="GM">GM</option>
+        </select>
+      </div>
+      <div class="filter-group"><span class="filter-label">Coord.</span>
+        <select class="filter-select" onchange="setCoord(this.value)">
+          <option value="all" selected>Todos</option>
+          <option value="German">German</option>
+          <option value="Nicolas">Nicolas</option>
+          <option value="Pedro">Pedro</option>
+        </select>
+      </div>
+    </div></div>
+        <div class="sec-label" id="storeCount"></div>
+        <div id="resumenPanel" style="display:none"></div>
+        <div class="store-grid" id="storeGrid">
+          <div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">
+            <div style="font-size:24px;margin-bottom:8px">⟳</div>
+            <div style="font-size:13px">Cargando datos...</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="tab-reclamos">
+        <div id="recContent"><div class="empty"><div class="empty-icon">📋</div><div>Sin reclamos</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DRILL DOWN -->
+<div id="drillModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeDrill()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="drillTitle">Detalle de pedidos</div>
+        <div class="modal-subtitle" id="drillSubtitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeDrill()">✕</button>
+    </div>
+    <div class="modal-body">
+      <table class="modal-table">
+        <thead><tr>
+          <th>Pedido</th><th>Tienda</th><th>Transportadora</th><th style="text-align:right">Monto</th>
+        </tr></thead>
+        <tbody id="drillBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+// Conexión directa a ClickHouse desde el browser
+const CH_HOST='https://quantics.data-lake.janis.in:8443';
+const CH_USER='mysql4p8pu3ri02e_masonline-az';
+const CH_PASS=']xZ(%79Ec9_Ev7jiT9[Q';
+const CH_DB='janis_datawarehouse_masonline';
+const REFRESH_MS=5*60*1000;
+
+function getArgentinaDate(){
+  const now=new Date();
+  const ar=new Date(now.getTime()-3*60*60*1000);
+  return ar.toISOString().slice(0,10);
+}
+
+async function qCH(sql){
+  const auth=btoa(CH_USER+':'+CH_PASS);
+  const res=await fetch(`${CH_HOST}/?database=${CH_DB}`,{
+    method:'POST',
+    headers:{'Authorization':'Basic '+auth,'Content-Type':'text/plain'},
+    body:sql.trim()
+  });
+  if(!res.ok){
+    const txt=await res.text();
+    throw new Error('HTTP '+res.status+': '+txt.slice(0,200));
+  }
+  const d=await res.json();
+  return d.data||[];
+}
+
+function makeQueries(fecha){
+  const HOY=`'${fecha}'`;
+  const F=c=>`toDate(toTimezone(${c},'America/Argentina/Buenos_Aires'))`;
+  const EXCLUIR=`o.order_commerce_id NOT LIKE 'ORD-%'`;
+  return {
+    // Sin JOIN - usa warehouse_id directamente, el HTML convierte a numero_tienda
+    principal:`SELECT
+      o.shipping_warehouse_id AS wh_id,
+      o.status_code,
+      o.shipping_type,
+      countIf(o.order_commerce_id NOT LIKE '%-RMA') AS cantidad,
+      sumIf(o.total_amount, o.order_commerce_id NOT LIKE '%-RMA') AS monto_total,
+      countIf(o.order_commerce_id LIKE '%-RMA') AS cantidad_rma,
+      countIf(o.order_commerce_id NOT LIKE '%-RMA'
+        AND o.status_code IN ('readyForInvoice','invoiced','readyForDelivery','inDelivery','delivered',
+          'readyForInternalDistribution','fulfillingInternalDistribution','preparingInternalDistribution')
+        AND o.delivery_sla_start<=now()) AS a_tiempo,
+      countIf(o.order_commerce_id NOT LIKE '%-RMA'
+        AND o.status_code IN ('validatingPayments','pendingCandidatesConfirmation',
+          'candidatesConfirmationDeadlineExceeded','readyForPicking','readyToProcessPicking',
+          'picking','handling','needsRepacking','needsRescheduling')
+        AND o.delivery_sla_start<=now()) AS fuera_franja,
+      sumIf(o.total_amount, o.order_commerce_id NOT LIKE '%-RMA'
+        AND o.status_code IN ('readyForDelivery','inDelivery','fulfillingInternalDistribution',
+          'readyForInvoice','invoiced','delivered','handling','needsRepacking',
+          'readyForInternalDistribution','preparingInternalDistribution')) AS facturado
+      FROM orders o
+      WHERE ${F('o.delivery_sla_start')}=${HOY} AND ${EXCLUIR}
+      GROUP BY o.shipping_warehouse_id, o.status_code, o.shipping_type
+      SETTINGS max_execution_time=25 FORMAT JSON`,
+
+    warehouses:`SELECT warehouse_id, reference_id AS numero_tienda, warehouse_name AS nombre_tienda
+      FROM warehouses FORMAT JSON`,
+
+    faltantes:`SELECT o.shipping_warehouse_id AS wh_id,
+      count(DISTINCT i.order_id) AS pedidos_faltantes,
+      count(DISTINCT i.reference_id) AS items_faltantes
+      FROM order_items i INNER JOIN orders o ON i.order_id=o.order_id
+      WHERE ${F('o.delivery_sla_start')}=${HOY}
+      AND i.is_picked=false AND i.is_removed=false
+      AND i.selling_measurement_unit NOT IN ('kg','g','gr','lt','l','ml')
+      AND ${EXCLUIR} GROUP BY o.shipping_warehouse_id
+      SETTINGS max_execution_time=25 FORMAT JSON`,
+
+    pedidos:`SELECT o.order_id, o.order_commerce_id, o.status_code, o.shipping_type,
+      o.shipping_warehouse_id AS wh_id,
+      o.total_amount, o.order_commerce_id LIKE '%-RMA' AS es_rma
+      FROM orders o
+      WHERE ${F('o.delivery_sla_start')}=${HOY} AND ${EXCLUIR}
+      SETTINGS max_execution_time=25 FORMAT JSON`,
+  };
+}
+let _rt=null;
+// Flags para proteger datos cargados manualmente
+window._rmaManual=false;
+window._faltManual=false;
+window._faltPorTienda={};
+
+
+
+const STATUS_MAP={
+  new:{label:'Nuevo',color:'red',group:'new'},
+  validatingPayments:{label:'Valid.Pago',color:'yellow',group:'new'},
+  candidatesConfirmationDeadlineExceeded:{label:'Venc.Confirm.',color:'red',group:'attention'},
+  readyForPicking:{label:'Pend.Pick',color:'yellow',group:'picking'},
+  readyToProcessPicking:{label:'Pend.Pick',color:'yellow',group:'picking'},
+  picking:{label:'Picking',color:'yellow',group:'inpicking'},
+  pendingCompletePicking:{label:'Picking',color:'yellow',group:'inpicking'},
+  inPostPickingAudit:{label:'Picking',color:'yellow',group:'inpicking'},
+  picked:{label:'Picking',color:'yellow',group:'inpicking'},
+  pendingCandidatesConfirmation:{label:'Pend.Confirm.',color:'yellow',group:'inpicking'},
+  readyForInvoice:{label:'P.Facturar',color:'blue',group:'invoice'},
+  readyForDelivery:{label:'P.Entregar',color:'orange',group:'ready'},
+  readyForInternalDistribution:{label:'P.Entregar',color:'orange',group:'ready'},
+  preparingInternalDistribution:{label:'Preparando',color:'orange',group:'ready'},
+  inDelivery:{label:'En Camino',color:'blue',group:'delivery'},
+  fulfillingInternalDistribution:{label:'En Camino',color:'blue',group:'delivery'},
+  delivered:{label:'Entregado',color:'green',group:'delivered'},
+  canceled:{label:'Cancelado',color:'red',group:'canceled'},
+  notDelivered:{label:'No Entregado',color:'red',group:'canceled'},
+  cancelationRequested:{label:'Cancel.Ped.',color:'red',group:'canceled'},
+  needsIntervention:{label:'Intervención',color:'red',group:'attention'},
+  needsRescheduling:{label:'Reprogramar',color:'red',group:'attention'},
+  needsRepacking:{label:'Reempacar',color:'red',group:'attention'},
+  pickingRejected:{label:'Pick.Rech.',color:'red',group:'attention'},
+};
+
+
+// Mapa de tiendas: numero -> {coordinador, formato}
+const TIENDAS_MAP={
+  '1002':{coord:'German',formato:'Full 1'},'1003':{coord:'German',formato:'Full 1'},'1004':{coord:'German',formato:'Full 1'},'1005':{coord:'German',formato:'GM'},
+  '1006':{coord:'German',formato:'Full 1'},'1007':{coord:'German',formato:'Full 2'},'1008':{coord:'Pedro',formato:'Full 1'},'1010':{coord:'German',formato:'GM'},
+  '1011':{coord:'Pedro',formato:'Full 1'},'1012':{coord:'Pedro',formato:'Full 2'},'1013':{coord:'Nicolas',formato:'GM'},'1014':{coord:'Pedro',formato:'Full 1'},
+  '1015':{coord:'German',formato:'GM'},'1016':{coord:'Nicolas',formato:'GM'},'1017':{coord:'Pedro',formato:'GM'},'1018':{coord:'Nicolas',formato:'GM'},
+  '1020':{coord:'Pedro',formato:'Full 1'},'1021':{coord:'Nicolas',formato:'GM'},'1022':{coord:'Nicolas',formato:'Full 2'},'1023':{coord:'Nicolas',formato:'Full 2'},
+  '1024':{coord:'Pedro',formato:'Full 1'},'1026':{coord:'German',formato:'Full 2'},'1027':{coord:'Pedro',formato:'GM'},'1028':{coord:'Nicolas',formato:'GM'},
+  '1029':{coord:'Pedro',formato:'GM'},'1030':{coord:'Pedro',formato:'GM'},'1031':{coord:'Pedro',formato:'Full 1'},'1032':{coord:'Nicolas',formato:'GM'},
+  '1033':{coord:'Pedro',formato:'Full 2'},'1035':{coord:'Pedro',formato:'Full 1'},'1036':{coord:'Pedro',formato:'GM'},'1037':{coord:'Nicolas',formato:'GM'},
+  '1038':{coord:'Nicolas',formato:'Full 1'},'1039':{coord:'German',formato:'GM'},'1042':{coord:'Nicolas',formato:'Full 2'},'1043':{coord:'Pedro',formato:'GM'},
+  '1044':{coord:'Pedro',formato:'GM'},'1045':{coord:'Pedro',formato:'GM'},'1046':{coord:'Nicolas',formato:'Full 2'},'1050':{coord:'Nicolas',formato:'GM'},
+  '1051':{coord:'Pedro',formato:'Full 2'},'1052':{coord:'Pedro',formato:'Full 2'},'1053':{coord:'Nicolas',formato:'Full 2'},'1054':{coord:'Nicolas',formato:'Full 1'},
+  '1055':{coord:'German',formato:'Full 1'},'1056':{coord:'German',formato:'Full 2'},'1057':{coord:'Nicolas',formato:'Full 1'},'1058':{coord:'Pedro',formato:'Full 1'},
+  '1059':{coord:'Pedro',formato:'GM'},'1060':{coord:'German',formato:'GM'},'1061':{coord:'Nicolas',formato:'Full 2'},'1067':{coord:'German',formato:'Full 2'},
+  '1068':{coord:'German',formato:'GM'},'1074':{coord:'Pedro',formato:'Full 2'},'1075':{coord:'Pedro',formato:'GM'},'1076':{coord:'Nicolas',formato:'GM'},
+  '1077':{coord:'Nicolas',formato:'Full 2'},'1078':{coord:'Pedro',formato:'Full 2'},'1080':{coord:'Pedro',formato:'Full 1'},'1081':{coord:'German',formato:'GM'},
+  '1082':{coord:'Pedro',formato:'GM'},'1084':{coord:'Nicolas',formato:'Full 2'},'1085':{coord:'Pedro',formato:'GM'},'1086':{coord:'Pedro',formato:'GM'},
+  '1087':{coord:'Pedro',formato:'Full 1'},'1088':{coord:'Pedro',formato:'Full 2'},'1092':{coord:'German',formato:'GM'},'1093':{coord:'Nicolas',formato:'GM'},
+  '1096':{coord:'Nicolas',formato:'GM'},'1097':{coord:'German',formato:'GM'},'1098':{coord:'Pedro',formato:'Full 2'},'1099':{coord:'Pedro',formato:'GM'},
+  '1100':{coord:'Nicolas',formato:'GM'},'1106':{coord:'Pedro',formato:'GM'},'1108':{coord:'Nicolas',formato:'Full 2'},'1110':{coord:'Nicolas',formato:'GM'},
+  '1111':{coord:'Pedro',formato:'Full 2'},'1114':{coord:'Pedro',formato:'Full 2'},'1115':{coord:'Nicolas',formato:'Full 1'},'1116':{coord:'Nicolas',formato:'GM'},
+  '1119':{coord:'Pedro',formato:'GM'},'2997':{coord:'German',formato:'Full 1'},'2998':{coord:'Nicolas',formato:'Full 1'},'2999':{coord:'Nicolas',formato:'Full 1'},
+  '3601':{coord:'Pedro',formato:'Full 1'},'3602':{coord:'Nicolas',formato:'Full 1'},'3603':{coord:'German',formato:'Full 1'},'3604':{coord:'German',formato:'Full 1'},
+  '3605':{coord:'German',formato:'Full 1'},'3606':{coord:'German',formato:'Full 1'},'3608':{coord:'Nicolas',formato:'Full 1'},'3613':{coord:'German',formato:'Full 1'},
+  '4001':{coord:'Nicolas',formato:'Full 2'}
+};
+
+
+let pedData=[], rmaData=[], factData=[], ontimeData=[], faltData=[], tipoData=[];
+
+
+let activeFilter='all', activeCoord='all', activeFormato='all', activeView='formato';
+
+
+// Mapa warehouseId (Janis) -> numero_tienda
+const WAREHOUSE_MAP={
+  '63504e8cfc433e91baa9bd12':'1006',
+  '63504eb692a63485e24c342f':'1035',
+  '63504e9db18e506af2419a58':'2999',
+  '63504ea5b18e506af2419a5d':'3602',
+  '63504eb292a63485e24c342b':'1038',
+  '63504e9ab18e506af2419a55':'1057',
+  '63504e9db18e506af2419a57':'2997',
+  '63504ea992a63485e24c3427':'3605',
+  '63504ea5b18e506af2419a5e':'3606',
+  '63504ea2b18e506af2419a5b':'1008',
+  '63504eb192a63485e24c342a':'1024',
+  '63504eaa92a63485e24c3428':'1115',
+  '63504eab92a63485e24c3429':'3613',
+  '63504eb892a63485e24c3430':'1031',
+  '63504e9eb18e506af2419a59':'3601',
+  '63504ea3b18e506af2419a5c':'1014',
+  '63504ea792a63485e24c3426':'3608',
+  '63504e97b18e506af2419a54':'1054',
+  '63504ea792a63485e24c3425':'3604',
+  '63504e9fb18e506af2419a5a':'1087',
+  '63504e8d92a63485e24c3423':'1058',
+  '63504e8bfc433e91baa9bd11':'1002',
+  '63504eb392a63485e24c342c':'1011',
+  '63504e8c92a63485e24c3421':'1004',
+  '63504e8cb18e506af2419a50':'1003',
+  '63504ec092a63485e24c3431':'1067',
+  '63504e9bb18e506af2419a56':'3603',
+  '63504eb592a63485e24c342e':'1080',
+  '63504e95b18e506af2419a52':'1020',
+  '63504eb592a63485e24c342d':'1055',
+  '63504e95b18e506af2419a53':'2998',
+  '63504ecfb18e506af2419a60':'1022',
+  '63504ed492a63485e24c343a':'1026',
+  '63504efab18e506af2419a67':'1077',
+  '63504ef1b18e506af2419a63':'1061',
+  '63504eea92a63485e24c3442':'1051',
+  '6355af9e555bc48e284e4f0c':'2999',
+  '6355a9213b12e22a600e7103':'1020',
+  '634dcb48cceabbe39a533c01':'7460',
+  '6355b04397b4c2a2405553f4':'3601',
+  '63bd79d0b26b20a5702b3964':'2997',
+};
+
+
+async function fetchAndUpdate(){
+  const badge=document.getElementById('autoStatus');
+  const lastUp=document.getElementById('lastUpdate');
+  try{
+    if(badge){badge.className='auto-badge loading';const t=document.getElementById('autoStatusText');if(t)t.textContent='Actualizando…';}
+    
+    // Queries directas a ClickHouse
+    const fecha=getArgentinaDate();
+    const Q=makeQueries(fecha);
+    const safe=async(sql,label)=>{try{return await qCH(sql);}catch(e){console.error('[CH]',label,e.message);return[];}};
+    // Cargar warehouses primero para hacer el mapeo wh_id → numero_tienda
+    const [principal, whData, faltantesRaw]=await Promise.all([
+      safe(Q.principal,'principal'),
+      safe(Q.warehouses,'warehouses'),
+      safe(Q.faltantes,'faltantes')
+    ]);
+
+    // Construir mapa warehouse_id → {numero_tienda, nombre_tienda}
+    const whMap={};
+    whData.forEach(w=>{ whMap[w.warehouse_id]={num:String(w.numero_tienda||''),nombre:w.nombre_tienda||''}; });
+
+    // Expandir principal usando whMap
+    const pedidos=[], tiposMap={}, ontimeMap={}, facturacionMap={};
+    principal.forEach(r=>{
+      const wh=whMap[r.wh_id]||{num:'',nombre:''};
+      const num=wh.num||r.wh_id;
+      const nombre=wh.nombre;
+      const cnt=parseInt(r.cantidad)||0;
+      const montoUnit=cnt>0?(parseFloat(r.monto_total)||0)/cnt:0;
+      for(let i=0;i<cnt;i++) pedidos.push({
+        order_id:'',order_commerce_id:'',status_code:r.status_code,
+        shipping_type:r.shipping_type||'',numero_tienda:num,
+        nombre_tienda:nombre,total_amount:montoUnit,es_rma:false
+      });
+      const cntRma=parseInt(r.cantidad_rma)||0;
+      for(let i=0;i<cntRma;i++) pedidos.push({
+        order_id:'',order_commerce_id:'',status_code:r.status_code,
+        shipping_type:r.shipping_type||'',numero_tienda:num,
+        nombre_tienda:nombre,total_amount:0,es_rma:true
+      });
+      const tkey=num+'|'+r.shipping_type;
+      if(!tiposMap[tkey]) tiposMap[tkey]={numero_tienda:num,shipping_type:r.shipping_type,cantidad:0};
+      tiposMap[tkey].cantidad+=cnt;
+      if(!ontimeMap[num]) ontimeMap[num]={numero_tienda:num,a_tiempo:0,fuera_franja:0,total_activos:0};
+      ontimeMap[num].a_tiempo+=parseInt(r.a_tiempo)||0;
+      ontimeMap[num].fuera_franja+=parseInt(r.fuera_franja)||0;
+      ontimeMap[num].total_activos+=(parseInt(r.a_tiempo)||0)+(parseInt(r.fuera_franja)||0);
+      if(!facturacionMap[num]) facturacionMap[num]={numero_tienda:num,facturado_hoy:0};
+      facturacionMap[num].facturado_hoy+=parseFloat(r.facturado)||0;
+    });
+
+    // Mapear faltantes
+    const faltantes=faltantesRaw.map(r=>{
+      const wh=whMap[r.wh_id]||{num:r.wh_id};
+      return {...r, numero_tienda:wh.num};
+    });
+
+    const tipos=Object.values(tiposMap);
+    const ontime=Object.values(ontimeMap);
+    const facturacion=Object.values(facturacionMap);
+    const reclamos=[];
+
+    // Lazy load detalle para drill down
+    window._pedDetalleCargado=false;
+    window._loadPedDetalle=async()=>{
+      if(window._pedDetalleCargado) return;
+      const det=await safe(makeQueries(getArgentinaDate()).pedidos,'det');
+      if(det.length>0){
+        pedData=det.map(r=>({
+          order_id:r.order_id,order_commerce_id:r.order_commerce_id||'',
+          status_code:r.status_code,shipping_type:r.shipping_type||'',
+          numero_tienda:(whMap[r.wh_id]||{num:r.wh_id}).num,
+          nombre_tienda:(whMap[r.wh_id]||{nombre:''}).nombre,
+          total_amount:parseFloat(r.total_amount)||0,
+          es_rma:r.es_rma==1||r.es_rma===true||r.es_rma==='1'
+        }));
+        window._pedDetalleCargado=true;
+      }
+    };
+
+    const d={ok:true,ts:new Date().toISOString(),pedidos,faltantes,tipos,facturacion,ontime,reclamos};
+
+    pedData=pedidos;
+
+    // faltData: solo actualizar si no fue cargado manualmente
+    if(!window._faltManual){
+      faltData=faltantes;
+      window._faltPorTienda=window._faltPorTienda||{};
+      d.faltantes.forEach(r=>{
+        window._faltPorTienda[String(r.numero_tienda||'')]=parseInt(r.items_faltantes)||0;
+      });
+    }
+
+    tipoData=d.tipos.map(r=>({
+      numero_tienda:String(r.numero_tienda),
+      shipping_type:r.shipping_type,
+      cantidad:parseInt(r.cantidad)||0
+    }));
+
+    factData=d.facturacion.map(r=>({
+      numero_tienda:r.numero_tienda,
+      facturado_hoy:parseFloat(r.facturado_hoy)||0
+    }));
+
+    // rmaData: solo actualizar desde API si no fue cargado manualmente
+    if(!window._rmaManual){
+      rmaData=(d.reclamos||[]).map(r=>({
+        numero_tienda:String(r.numero_tienda||''),
+        motivo:r.motivo||r.status_code||'',
+        cantidad:parseInt(r.cantidad)||0
+      }));
+    }
+
+    ontimeData=ontime.map(r=>{
+      const at=parseInt(r.a_tiempo)||0;
+      const ff=parseInt(r.fuera_franja)||0;
+      // On time: solo sobre pedidos ya facturados (a_tiempo + fuera_franja)
+      const base=at+ff;
+      return {
+        numero_tienda:String(r.numero_tienda),
+        fuera_franja:ff,
+        a_tiempo:at,
+        total_activos:base,
+        pct_on_time:base>0?Math.round(at/base*100):null
+      };
+    });
+
+    if(badge){badge.textContent='● En vivo';badge.className='auto-badge live';}
+    if(lastUp){lastUp.textContent='Actualizado: '+new Date(d.ts).toLocaleTimeString('es-AR');}
+    renderAll(); renderReclamos(); renderFact(); updateManualBadges();
+  }catch(err){
+    console.error('fetchAndUpdate:',err);
+    if(badge){badge.textContent='⚠ Sin conexión';badge.className='auto-badge error';}
+    if(lastUp){lastUp.textContent='Error — reintentando en 2 min';}
+  }
+}
+function manualRefresh(){if(_rt)clearInterval(_rt);fetchAndUpdate();_rt=setInterval(fetchAndUpdate,REFRESH_MS);}
+window.addEventListener('DOMContentLoaded',()=>{fetchAndUpdate();_rt=setInterval(fetchAndUpdate,REFRESH_MS);});
+
+
+
+
+
+
+
+
+
+// Grupos que cuentan como "en picking activo"
+const PICKING_GROUPS=['inpicking'];
+// Estado pendiente = nadie arrancó picking
+const PENDING_GROUPS=['picking','new'];
+
+setInterval(()=>{ document.getElementById('clock').textContent=new Date().toLocaleTimeString('es-AR'); },1000);
+
+const fmt$ = n => n>=1000000 ? '$'+(n/1000000).toFixed(1)+'M' : n>=1000 ? '$'+(n/1000).toFixed(0)+'K' : '$'+Math.round(n);
+
+function setFilter(k){ activeFilter=k; renderStores(); }
+function setCoord(k){ activeCoord=k; renderStores(); }
+function setFormato(k){ activeFormato=k; renderStores(); }
+
+document.getElementById('pedInput').addEventListener('change',e=>{ Papa.parse(e.target.files[0],{header:true,skipEmptyLines:true,complete:r=>{pedData=r.data;renderAll();}}); });
+document.getElementById('rmaInput').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  window._rmaManual=true; updateManualBadges();
+  const ext=file.name.split('.').pop().toLowerCase();
+
+  function processRows(rows){
+    if(rows.length && rows[0].typeName!==undefined){
+      // MÉTODO 1: mapear por orderCommerceId → numero_tienda (más confiable)
+      const orderCommerceMap={};
+      pedData.forEach(r=>{
+        if(r.order_commerce_id&&r.numero_tienda){
+          orderCommerceMap[String(r.order_commerce_id).trim()]=String(r.numero_tienda);
+        }
+      });
+
+      // MÉTODO 2: fallback por email ecommNNNN@
+      const emailNumMap={};
+      // nada por defecto, se llena desde rows
+
+      // MÉTODO 3: mapeo fijo por nombre de sucursal
+      const SUCURSAL_MAP={
+        'rio cuarto':'1002','san luis':'1003','san fernando':'1004','las heras mendoza':'1005',
+        'san juan':'1006','la rioja':'1007','corrientes':'1008','cordoba sur':'1010',
+        'salta':'1011','santiago':'1012','tigre':'1013','lujan':'1014',
+        'maipú':'1015','hc avellaneda 2':'1016','tablada':'1017','quilmes':'1018',
+        'tucumán':'1020','tucuman':'1020','neuquén 2':'1021','neuquen 2':'1021',
+        'bariloche':'1022','la pampa':'1023','formosa':'1024','catamarca':'1026',
+        'mataderos':'1027','alte brown':'1028','moreno':'1029','josé c paz':'1030',
+        'jujuy':'1031','malvinas':'1032','río salí':'1033','3 de febrero':'1035',
+        'moreno shopping':'1036','san martin':'1037','cipolletti':'1038','paraná 2':'1039',
+        'trelew':'1042','laferrere':'1043','hurlingham villegas':'1044','hurlingham vergara':'1045',
+        'pergamino':'1046','lanús':'1050','posadas':'1051','oran':'1052',
+        'viedma':'1053','olavarría':'1054','villa mercedes (san luis)':'1055','villa nueva':'1056',
+        'comodoro sur':'1057','resistencia':'1058','gonzález catán':'1059','fuerza aérea cba.':'1060',
+        'junín':'1061','san martín mendoza':'1067','mendoza benegas':'1068','goya':'1074',
+        'fuerza aérea salta':'1075','lomas de zamora':'1076','gral. pico':'1077','tartagal':'1078',
+        'santiago del estero sur':'1080','rawson san juan':'1081','tucumán av. jujuy':'1082',
+        'san vicente':'1084','corrientes av. maipú':'1085','formosa 2':'1086','pilar':'1087',
+        'tucumán concepción':'1088','san juan norte':'1092','comodoro 2':'1093','caseros':'1096',
+        'donato álvarez':'1097','sáenz peña. chaco':'1098','posadas 2':'1099','santa rosa':'1100',
+        'tucuman ejercito nor.':'1106','puerto madryn':'1108','claypole':'1110','san pedro jujuy':'1111',
+        'clorinda':'1114','general roca':'1115','morón':'1116','moreno derqui':'1119',
+        'constituyentes':'2997','san justo':'2998','avellaneda':'2999',
+        'la plata':'3601','bahía blanca':'3602','bahia blanca':'3602',
+        'santa fé':'3603','santa fe':'3603','paraná':'3604','parana':'3604',
+        'córdoba oeste':'3605','cordoba oeste':'3605',
+        'córdoba este':'3606','cordoba este':'3606',
+        'neuquén':'3608','neuquen':'3608',
+        'guaymallén':'3613','guaymallen':'3613',
+        'campana':'4001',
+        // También con prefijo "sucursal"
+        'sucursal constituyentes':'2997','sucursal san justo':'2998','sucursal avellaneda':'2999',
+        'sucursal la plata':'3601','sucursal bahía blanca':'3602','sucursal bahia blanca':'3602',
+        'sucursal santa fé':'3603','sucursal santa fe':'3603',
+        'sucursal paraná':'3604','sucursal parana':'3604',
+        'sucursal córdoba oeste':'3605','sucursal cordoba oeste':'3605',
+        'sucursal córdoba este':'3606','sucursal cordoba este':'3606',
+        'sucursal neuquén 2':'1021','sucursal neuquen 2':'1021',
+        'sucursal neuquén':'3608','sucursal neuquen':'3608',
+        'sucursal guaymallén':'3613','sucursal guaymallen':'3613',
+        'sucursal campana':'4001','sucursal pilar':'1087',
+        'sucursal 3 de febrero':'1035','sucursal malvinas':'1032',
+        'sucursal san fernando':'1004','sucursal la pampa':'1023',
+        'sucursal catamarca':'1026','sucursal formosa gutniski':'1024',
+        'sucursal formosa':'1024','sucursal santiago':'1012',
+        'sucursal santiago del estero sur':'1080',
+        'sucursal comodoro sur':'1057','sucursal tucuman 1020':'1020',
+        'sucursal cordoba talleres':'3606',
+      };
+
+      const byStoreMotivo={};
+      rows.forEach(r=>{
+        if(r.areaInChargeName!=='Ecommerce') return;
+        const typeName=r.typeName||'';
+        const parts=typeName.split('|');
+        const motivo=parts[parts.length-1]?.trim()||typeName;
+        const storeName=String(r.storeName||'').trim();
+
+        // Intentar obtener numero_tienda por orderCommerceId primero
+        const orderCommId=String(r.orderCommerceId||'').trim();
+        let numero_tienda=orderCommId?orderCommerceMap[orderCommId]:'';
+
+        // Fallback: buscar número en email
+        if(!numero_tienda){
+          const email=String(r.userCreated||r.userModified||'');
+          const emailMatch=email.match(/ecomm(\d+)@/);
+          if(emailMatch) numero_tienda=emailMatch[1];
+        }
+
+        // Fallback: mapeo por nombre de sucursal (normalizado)
+        if(!numero_tienda){
+          const snLow=storeName.toLowerCase()
+            .replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i')
+            .replace(/ó/g,'o').replace(/ú/g,'u').replace(/ñ/g,'n');
+          // Buscar directo o sin prefijo "sucursal "
+          numero_tienda=SUCURSAL_MAP[snLow]
+            || SUCURSAL_MAP[snLow.replace(/^sucursal /,'')]
+            || SUCURSAL_MAP['sucursal '+snLow.replace(/^sucursal /,'')]
+            || '';
+        }
+
+        const k=(numero_tienda||storeName)+'|'+motivo;
+        if(!byStoreMotivo[k]) byStoreMotivo[k]={numero_tienda,tienda:storeName,motivo,cantidad:0};
+        byStoreMotivo[k].cantidad++;
+      });
+      rmaData=Object.values(byStoreMotivo).filter(r=>r.cantidad>0);
+      console.log('rmaData matcheados:', rmaData.filter(r=>r.numero_tienda).length, '/ total:', rmaData.length);
+      console.log('sample:', rmaData.slice(0,3));
+    } else {
+      rmaData=rows;
+    }
+    renderReclamos(); renderKPIs(); renderStores(); if(activeView==='formato'||activeView==='coord') renderStores();
+  }
+
+  if(ext==='xlsx'||ext==='xls'){
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      processRows(XLSX.utils.sheet_to_json(ws,{defval:''}));
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    Papa.parse(file,{header:true,skipEmptyLines:true,complete:r=>{processRows(r.data);}});
+  }
+});
+document.getElementById('factInput').addEventListener('change',e=>{ Papa.parse(e.target.files[0],{header:true,skipEmptyLines:true,complete:r=>{factData=r.data;renderFact();renderKPIs();renderStores();}}); });
+document.getElementById('ontimeInput').addEventListener('change',e=>{ Papa.parse(e.target.files[0],{header:true,skipEmptyLines:true,complete:r=>{ontimeData=r.data;renderAll();}}); });
+document.getElementById('tipoInput').addEventListener('change',e=>{ Papa.parse(e.target.files[0],{header:true,skipEmptyLines:true,complete:r=>{tipoData=r.data;renderAll();}}); });
+document.getElementById('faltInput').addEventListener('change',e=>{
+  const file=e.target.files[0];
+  if(!file) return;
+  window._faltManual=true; updateManualBadges();
+  const ext=file.name.split('.').pop().toLowerCase();
+  if(ext==='xlsx'||ext==='xls'){
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws);
+      faltData=rows;
+      renderAll();
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    Papa.parse(file,{header:true,skipEmptyLines:true,complete:r=>{faltData=r.data;renderAll();}});
+  }
+});
+
+function switchTab(n){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['tiendas','reclamos'][i]===n));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+}
+
+function renderAll(){ renderKPIs(); renderStores(); }
+
+function renderKPIs(){
+  const STATUS_PRIORITY_KPI={
+    'cancelationRequested':0,'canceled':1,'notDelivered':2,
+    'validatingPayments':3,'pendingCandidatesConfirmation':4,
+    'candidatesConfirmationDeadlineExceeded':5,
+    'readyForPicking':6,'readyToProcessPicking':7,
+    'picking':8,'needsRepacking':9,'needsRescheduling':10,
+    'readyForInvoice':11,'readyForDelivery':12,
+    'readyForInternalDistribution':13,'preparingInternalDistribution':14,
+    'inDelivery':15,'fulfillingInternalDistribution':16,'delivered':17
+  };
+  const hasOrderId=pedData.length>0&&pedData[0].order_id!==undefined;
+  let sourceData=pedData;
+  if(hasOrderId){
+    const orderMap={};
+    pedData.forEach(r=>{
+      const oid=String(r.order_id||'');
+      if(!oid) return;
+      const prev=orderMap[oid];
+      const currPrio=STATUS_PRIORITY_KPI[r.status_code]??-1;
+      const prevPrio=prev?STATUS_PRIORITY_KPI[prev.status_code]??-1:-1;
+      if(!prev||currPrio>prevPrio) orderMap[oid]=r;
+    });
+    sourceData=Object.values(orderMap);
+  }
+
+  const groups={new:0,picking:0,inpicking:0,invoice:0,ready:0,delivery:0,delivered:0,canceled:0,attention:0};
+  let totalMonto=0, pendientes=0;
+  const atrasadosPorTienda={};
+
+  sourceData.forEach(r=>{
+    const wid=String(r.warehouse_id||'');
+    const WH_TO_NUM_KPI={'63504e8cfc433e91baa9bd12':'1006','63504eb692a63485e24c342f':'1035','63504e9db18e506af2419a58':'2999','63504ea5b18e506af2419a5d':'3602','63504eb292a63485e24c342b':'1038','63504e9ab18e506af2419a55':'1057','63504e9db18e506af2419a57':'2997','63504ea992a63485e24c3427':'3605','63504ea5b18e506af2419a5e':'3606','63504ea2b18e506af2419a5b':'1008','63504eb192a63485e24c342a':'1024','63504eaa92a63485e24c3428':'1115','63504eab92a63485e24c3429':'3613','63504eb892a63485e24c3430':'1031','63504e9eb18e506af2419a59':'3601','63504ea3b18e506af2419a5c':'1014','63504ea792a63485e24c3426':'3608','63504e97b18e506af2419a54':'1054','63504ea792a63485e24c3425':'3604','63504e9fb18e506af2419a5a':'1087','63504e8d92a63485e24c3423':'1058','63504e8bfc433e91baa9bd11':'1002','63504eb392a63485e24c342c':'1011','63504e8c92a63485e24c3421':'1004','63504e8cb18e506af2419a50':'1003','63504ec092a63485e24c3431':'1067','63504e9bb18e506af2419a56':'3603','63504eb592a63485e24c342e':'1080','63504e95b18e506af2419a52':'1020','63504eb592a63485e24c342d':'1055','63504e95b18e506af2419a53':'2998','63504ecfb18e506af2419a60':'1022','63504ed492a63485e24c343a':'1026','63504efab18e506af2419a67':'1077','63504ef1b18e506af2419a63':'1061','63504eea92a63485e24c3442':'1051',
+  '6355af9e555bc48e284e4f0c':'2999',
+  '6355a9213b12e22a600e7103':'1020',
+  '634dcb48cceabbe39a533c01':'7460',
+  '6355b04397b4c2a2405553f4':'3601',
+  '63bd79d0b26b20a5702b3964':'2997','63504ec192a63485e24c3432':'1007','63504edd92a63485e24c343e':'1042','63504ee892a63485e24c3440':'1053','63504ee992a63485e24c3441':'1052','63504ef3b18e506af2419a64':'1074','63504ef8b18e506af2419a66':'1076','63504efab18e506af2419a68':'1078','63504f09b18e506af2419a70':'1098','63504f0fb18e506af2419a74':'1108','63504f1692a63485e24c3444':'1111','63504f16b18e506af2419a76':'1114','63559fcb5b11c585b035e0ce':'1004','6355b71755d36b700b2c252b':'3613','6355b8bf6056dcde2a5ac6fe':'3606','638e5706509037a5c5db1754':'1082','639108990b1f096c165d23dd':'1012','6391195cf3d5234f6ef23876':'1106','63ce8f0d95ad0d624a809f66':'1033','64403ce70bb634f526c76b01':'1096','656a2cd56e656c941586e526':'4001','6355af9e555bc48e284e4f0c':'2999'};
+    let key=String(r.numero_tienda||'').trim();
+    if(!key||key===''||key==='undefined'||key==='null') key=WH_TO_NUM_KPI[wid]||'';
+    const g=STATUS_MAP[r.status_code]?.group;
+    if(g) groups[g]+=1;
+    totalMonto+=(parseFloat(r.total_amount||r.monto_ordenado)||0);
+    const val=parseInt(r.atrasados)||0;
+    if(key) atrasadosPorTienda[key]=Math.max(atrasadosPorTienda[key]||0, val);
+    if(r.status_code==='readyForPicking'||r.status_code==='readyToProcessPicking'){
+      pendientes+=1;
+    }
+  });
+
+  let totalDelivery=0, totalPickup=0, totalDrive=0;
+  tipoData.forEach(r=>{
+    const stype=r.shipping_type||'';
+    if(stype==='delivery') totalDelivery+=(parseInt(r.cantidad)||0);
+    else if(stype==='store_pickup') totalPickup+=(parseInt(r.cantidad)||0);
+    else if(stype==='drive_through') totalDrive+=(parseInt(r.cantidad)||0);
+  });
+  // Atrasados desde CSV de On Time (fuera_franja)
+  const atrasados=ontimeData.length>0?ontimeData.reduce((s,r)=>s+(parseInt(r.fuera_franja)||0),0):Object.values(atrasadosPorTienda).reduce((a,b)=>a+b,0);
+
+  const total=Object.values(groups).reduce((a,b)=>a+b,0);
+  const reclamos=rmaData.reduce((s,r)=>s+(parseInt(r.cantidad)||0),0);
+  const pedFaltantes=faltData.length>0?(()=>{
+    const orders=new Set();
+    faltData.forEach(r=>{
+      const refId=String(r.refId||'');
+      if(parseFloat(r.missingQuantity||0)>0&&!(refId.startsWith('02')&&refId.length===13)){
+        const oid=String(r.orderId||'');
+        if(oid) orders.add(oid);
+      }
+    });
+    return orders.size;
+  })():0;
+  const itemsFaltantes=faltData.length>0?(()=>{
+    const refs=new Set();
+    faltData.forEach(r=>{
+      const refId=String(r.refId||'');
+      if(parseFloat(r.missingQuantity||0)>0&&!(refId.startsWith('02')&&refId.length===13))
+        refs.add(refId);
+    });
+    return refs.size;
+  })():0;
+
+  // BARRA KPI EJECUTIVA
+  document.getElementById('kTotal').textContent=total.toLocaleString('es');
+  document.getElementById('kTotalSub').textContent=`${groups.delivered.toLocaleString('es')} entregados · ${(groups.ready+groups.delivery).toLocaleString('es')} por entregar`;
+  document.getElementById('kPendientes').textContent=pendientes.toLocaleString('es');
+  document.getElementById('kMonto').textContent=fmt$(totalMonto);
+  // facturación sub se actualiza en renderFact
+  document.getElementById('kCanceled').textContent=groups.canceled.toLocaleString('es');
+
+  // PANEL IZQUIERDO
+  document.getElementById('kInPicking').textContent=groups.inpicking.toLocaleString('es');
+  document.getElementById('kInvoice').textContent=groups.invoice.toLocaleString('es');
+  document.getElementById('kReady').textContent=(groups.ready+groups.delivery).toLocaleString('es');
+  document.getElementById('kDelivered').textContent=groups.delivered.toLocaleString('es');
+  document.getElementById('kDelayed').textContent=atrasados.toLocaleString('es');
+  document.getElementById('kDelivery').textContent=totalDelivery.toLocaleString('es');
+  document.getElementById('kPickup').textContent=totalPickup.toLocaleString('es');
+  document.getElementById('kDrive').textContent=totalDrive>0?totalDrive.toLocaleString('es'):'—';
+  document.getElementById('kReclamos').textContent=reclamos.toLocaleString('es');
+  document.getElementById('kFaltantes').textContent=faltData.length>0?pedFaltantes.toLocaleString('es'):'—';
+  document.getElementById('kItemsFalt').textContent=faltData.length>0?itemsFaltantes.toLocaleString('es'):'—';
+
+  // Semáforo general — siempre desde pedidos
+  const enPicking=groups.inpicking;
+  const totalSinCancelG=sourceData.reduce((s,r)=>{
+    const g=STATUS_MAP[r.status_code]?.group;
+    return g&&g!=="canceled"?s+1:s;
+  },0);
+  const ontimeGlobal=ontimeData.length>0?(()=>{const tot=ontimeData.reduce((s,r)=>s+(parseInt(r.total_activos)||0),0);const at=ontimeData.reduce((s,r)=>s+(parseInt(r.a_tiempo)||0),0);return tot>0?Math.round(at/tot*100):null;})():totalSinCancelG>0?Math.round((totalSinCancelG-atrasados)/totalSinCancelG*100):null;
+
+  const semColor=ontimeGlobal===null?"none":ontimeGlobal>=98?"green":ontimeGlobal>=92?"yellow":"red";
+  const semColorVar=semColor==="green"?"var(--green)":semColor==="yellow"?"var(--yellow)":semColor==="red"?"var(--red)":"var(--muted)";
+  const pctEl=document.getElementById("ontimeGlobalPct");
+  if(pctEl){ pctEl.textContent=ontimeGlobal!==null?ontimeGlobal+'%':'—'; pctEl.style.color=semColorVar; }
+  document.getElementById("lRed").className="light-big"+(semColor==="red"?" on-red":"");
+  document.getElementById("lRedSub").textContent=atrasados>0?`${atrasados} pedidos`:"0 pedidos";
+  document.getElementById("lYellow").className="light-big"+(semColor==="yellow"?" on-yellow":"");
+  document.getElementById("lYellowSub").textContent=enPicking>0?`${enPicking} pedidos`:"—";
+  document.getElementById("lGreen").className="light-big"+(semColor==="green"?" on-green":"");
+  const pedAtiempo=ontimeData.length>0?ontimeData.reduce((s,r)=>s+(parseInt(r.a_tiempo)||0),0):0;
+  document.getElementById("lGreenSub").textContent=pedAtiempo>0?`${pedAtiempo} pedidos`:"—";
+}
+
+function renderFact(){
+  if(!factData.length) return;
+
+  // Ya facturado = suma de facturado_hoy del CSV de facturación
+  const yaFacturado=factData.reduce((s,r)=>{
+    const k=String(r.numero_tienda||'').trim();
+    if(!k||k==='desconocido') return s;
+    return s+(parseFloat(r.facturado_hoy)||0);
+  },0);
+
+  // Total del dia = monto deduplicado por order_id
+  const SP={"cancelationRequested":0,"canceled":1,"notDelivered":2,"validatingPayments":3,"pendingCandidatesConfirmation":4,"candidatesConfirmationDeadlineExceeded":5,"readyForPicking":6,"readyToProcessPicking":7,"picking":8,"needsRepacking":9,"needsRescheduling":10,"readyForInvoice":11,"readyForDelivery":12,"readyForInternalDistribution":13,"preparingInternalDistribution":14,"inDelivery":15,"fulfillingInternalDistribution":16,"delivered":17};
+  const hasOid=pedData.length>0&&pedData[0].order_id!==undefined;
+  let pedDd=pedData;
+  if(hasOid){const om={};pedData.forEach(r=>{const oid=String(r.order_id||"");if(!oid)return;const prev=om[oid];const cp=SP[r.status_code]??-1;const pp=prev?SP[prev.status_code]??-1:-1;if(!prev||cp>pp)om[oid]=r;});pedDd=Object.values(om);}
+  const totalDia=pedDd.reduce((s,r)=>s+(parseFloat(r.total_amount||r.monto_ordenado)||0),0);
+
+  const pct=totalDia>0?Math.round(yaFacturado/totalDia*100):0;
+
+  const canceladoMonto=pedDd.filter(r=>['canceled','cancelationRequested','notDelivered'].includes(r.status_code)).reduce((s,r)=>s+(parseFloat(r.total_amount||r.monto_ordenado)||0),0);
+  document.getElementById('mAFacturar').textContent=fmt$(totalDia);
+  document.getElementById('mHoy').textContent=fmt$(yaFacturado);
+  document.getElementById('mPct').textContent=pct+'%';
+  document.getElementById('mBar').style.width=Math.min(pct,100)+'%';
+  document.getElementById('mBar').style.background=pct>=80?'var(--green)':pct>=50?'var(--yellow)':'var(--red)';
+  const mCEl=document.getElementById('mCancelado'); if(mCEl) mCEl.textContent=canceladoMonto>0?fmt$(canceladoMonto):'—';
+  // KPI card facturación
+  const kFactVal=document.getElementById('kFactVal');
+  const kFactPct=document.getElementById('kFactPct');
+  const kFactBar=document.getElementById('kFactBar');
+  const pctColor=pct>=80?'var(--green)':pct>=50?'var(--yellow)':'var(--red)';
+  if(kFactVal){ kFactVal.textContent=fmt$(yaFacturado); kFactVal.style.color=pctColor; }
+  if(kFactPct){ kFactPct.textContent=pct+'%'; kFactPct.style.color=pctColor; }
+  if(kFactBar){ kFactBar.style.width=Math.min(pct,100)+'%'; kFactBar.style.background=pctColor; }
+  // Sub cancelados con monto
+  const cancelSubEl=document.getElementById('kCanceladoSub');
+  if(cancelSubEl&&canceladoMonto>0) cancelSubEl.textContent=fmt$(canceladoMonto)+' en monto';
+}
+
+function renderStores(){
+  if(!pedData.length) return;
+
+  // Orden de prioridad de estados (el último en la cadena operativa gana)
+  const STATUS_PRIORITY={
+    'cancelationRequested':0,'canceled':1,'notDelivered':2,
+    'validatingPayments':3,'pendingCandidatesConfirmation':4,
+    'candidatesConfirmationDeadlineExceeded':5,
+    'readyForPicking':6,'readyToProcessPicking':7,
+    'picking':8,'needsRepacking':9,'needsRescheduling':10,
+    'readyForInvoice':11,'readyForDelivery':12,
+    'readyForInternalDistribution':13,'preparingInternalDistribution':14,
+    'inDelivery':15,'fulfillingInternalDistribution':16,'delivered':17
+  };
+
+  // Si el CSV trae order_id, deduplicamos por order_id tomando el estado de mayor prioridad
+  const hasOrderId=pedData.length>0&&pedData[0].order_id!==undefined;
+
+  let processedData=pedData;
+  if(hasOrderId){
+    // Deduplicar: por cada order_id quedarse con el registro de mayor prioridad de estado
+    const orderMap={};
+    pedData.forEach(r=>{
+      const oid=String(r.order_id||'');
+      if(!oid) return;
+      const prev=orderMap[oid];
+      const currPrio=STATUS_PRIORITY[r.status_code]??-1;
+      const prevPrio=prev?STATUS_PRIORITY[prev.status_code]??-1:-1;
+      if(!prev||currPrio>prevPrio) orderMap[oid]=r;
+    });
+    processedData=Object.values(orderMap);
+  }
+
+  // Traducir warehouse_id a numero_tienda si el CSV no trae numero_tienda
+  const WH_TO_NUM={
+    '63504e8cfc433e91baa9bd12':'1006','63504eb692a63485e24c342f':'1035',
+    '63504e9db18e506af2419a58':'2999','63504ea5b18e506af2419a5d':'3602',
+    '63504eb292a63485e24c342b':'1038','63504e9ab18e506af2419a55':'1057',
+    '63504e9db18e506af2419a57':'2997','63504ea992a63485e24c3427':'3605',
+    '63504ea5b18e506af2419a5e':'3606','63504ea2b18e506af2419a5b':'1008',
+    '63504eb192a63485e24c342a':'1024','63504eaa92a63485e24c3428':'1115',
+    '63504eab92a63485e24c3429':'3613','63504eb892a63485e24c3430':'1031',
+    '63504e9eb18e506af2419a59':'3601','63504ea3b18e506af2419a5c':'1014',
+    '63504ea792a63485e24c3426':'3608','63504e97b18e506af2419a54':'1054',
+    '63504ea792a63485e24c3425':'3604','63504e9fb18e506af2419a5a':'1087',
+    '63504e8d92a63485e24c3423':'1058','63504e8bfc433e91baa9bd11':'1002',
+    '63504eb392a63485e24c342c':'1011','63504e8c92a63485e24c3421':'1004',
+    '63504e8cb18e506af2419a50':'1003','63504ec092a63485e24c3431':'1067',
+    '63504e9bb18e506af2419a56':'3603','63504eb592a63485e24c342e':'1080',
+    '63504e95b18e506af2419a52':'1020','63504eb592a63485e24c342d':'1055',
+    '63504e95b18e506af2419a53':'2998','63504ecfb18e506af2419a60':'1022',
+    '63504ed492a63485e24c343a':'1026','63504efab18e506af2419a67':'1077',
+    '63504ef1b18e506af2419a63':'1061','63504eea92a63485e24c3442':'1051',
+  '6355af9e555bc48e284e4f0c':'2999',
+  '6355a9213b12e22a600e7103':'1020',
+  '634dcb48cceabbe39a533c01':'7460',
+  '6355b04397b4c2a2405553f4':'3601',
+  '63bd79d0b26b20a5702b3964':'2997',
+    '63504ec192a63485e24c3432':'1007','63504edd92a63485e24c343e':'1042',
+    '63504ee892a63485e24c3440':'1053','63504ee992a63485e24c3441':'1052',
+    '63504ef3b18e506af2419a64':'1074','63504ef8b18e506af2419a66':'1076',
+    '63504efab18e506af2419a68':'1078','63504f09b18e506af2419a70':'1098',
+    '63504f0fb18e506af2419a74':'1108','63504f1692a63485e24c3444':'1111',
+    '63504f16b18e506af2419a76':'1114','63559fcb5b11c585b035e0ce':'1004',
+    '6355b71755d36b700b2c252b':'3613','6355b8bf6056dcde2a5ac6fe':'3606',
+    '638e5706509037a5c5db1754':'1082','639108990b1f096c165d23dd':'1012',
+    '6391195cf3d5234f6ef23876':'1106','63ce8f0d95ad0d624a809f66':'1033',
+    '64403ce70bb634f526c76b01':'1096','656a2cd56e656c941586e526':'4001',
+    '6355af9e555bc48e284e4f0c':'2999',
+    '6355a9213b12e22a600e7103':'1020',
+    '634dcb48cceabbe39a533c01':'7460',
+    '6355b04397b4c2a2405553f4':'3601',
+    '63bd79d0b26b20a5702b3964':'2997'
+  };
+
+  const stores={};
+  processedData.forEach(r=>{
+    // Soportar tanto CSV con numero_tienda como con warehouse_id
+    let key=String(r.numero_tienda||'').trim();
+    if(!key||key===''||key==='undefined'||key==='null'){
+      const wid=String(r.warehouse_id||'').trim();
+      key=WH_TO_NUM[wid]||'';
+    }
+    if(!key||key===''||key==='undefined'||key==='null') return;
+    const name=key;
+    if(!stores[key]) stores[key]={name,num:key,statuses:{},atrasados:0,monto:0,reclamos:0,ontime:null,facturado:0,pendientes:0,preparados:0,faltantes:0,pedFalt:0,
+      coord:TIENDAS_MAP[key]?.coord||'—',formato:TIENDAS_MAP[key]?.formato||'—',
+      delivery:0,store_pickup:0,drive_through:0,monto_cancelado:0};
+    // cantidad: si viene del CSV nuevo (una fila = un pedido) siempre es 1
+    const cant=hasOrderId?1:(parseInt(r.cantidad)||0);
+    stores[key].statuses[r.status_code]=(stores[key].statuses[r.status_code]||0)+cant;
+    stores[key].atrasados=Math.max(stores[key].atrasados,parseInt(r.atrasados)||0);
+    stores[key].monto+=(parseFloat(r.total_amount||r.monto_ordenado)||0);
+    if(['canceled','cancelationRequested','notDelivered'].includes(r.status_code)){
+      stores[key].monto_cancelado+=(parseFloat(r.total_amount||r.monto_ordenado)||0);
+    }
+    if(r.status_code==='readyForPicking'||r.status_code==='readyToProcessPicking'){
+      stores[key].pendientes+=cant;
+    }
+    // Preparados = estados que ya terminaron picking
+    if(['readyForInvoice','readyForDelivery','readyForInternalDistribution','preparingInternalDistribution','inDelivery','fulfillingInternalDistribution','delivered'].includes(r.status_code)){
+      stores[key].preparados+=(parseInt(r.cantidad)||0);
+    }
+  });
+
+  // Faltantes desde CSV usando warehouseId
+  if(faltData.length>0){
+    const faltRefs={};   // refs únicas por tienda
+    const faltOrders={}; // pedidos únicos por tienda
+    faltData.forEach(r=>{
+      const missingQty=parseFloat(r.missingQuantity||r.noSubstitutedQuantity||0);
+      if(missingQty<=0) return;
+      const refId=String(r.refId||'');
+      if(refId.length===13&&(refId.startsWith('02')||refId.startsWith('20')||refId.startsWith('27'))) return;
+      const unit=String(r.sellingMeasurementUnit||r.selling_measurement_unit||'').toLowerCase();
+      if(['kg','g','gr','lt','l','ml'].includes(unit)) return;
+      const wid=r.warehouseId||'';
+      const key=WAREHOUSE_MAP[wid];
+      if(!key) return;
+      if(!faltRefs[key]) faltRefs[key]=new Set();
+      faltRefs[key].add(refId);
+      const oid=String(r.orderId||'');
+      if(oid){
+        if(!faltOrders[key]) faltOrders[key]=new Set();
+        faltOrders[key].add(oid);
+      }
+    });
+    Object.keys(faltRefs).forEach(k=>{
+      if(stores[k]){
+        stores[k].faltantes=faltRefs[k].size;
+        stores[k].pedFalt=faltOrders[k]?faltOrders[k].size:faltRefs[k].size;
+      }
+    });
+  }
+
+  rmaData.forEach(r=>{ const k=String(r.numero_tienda); if(stores[k]) stores[k].reclamos+=(parseInt(r.cantidad)||0); });
+  tipoData.forEach(r=>{
+    const k=String(r.numero_tienda);
+    if(!stores[k]) return;
+    const stype=r.shipping_type||'';
+    if(stype==='delivery') stores[k].delivery+=(parseInt(r.cantidad)||0);
+    else if(stype==='store_pickup') stores[k].store_pickup+=(parseInt(r.cantidad)||0);
+    else if(stype==='drive_through') stores[k].drive_through+=(parseInt(r.cantidad)||0);
+  });
+  ontimeData.forEach(r=>{
+    const k=String(r.numero_tienda).trim();
+    if(!k||k===''||k==='undefined') return;
+    if(stores[k]){
+      stores[k].ontime=r.pct_on_time!=null?Math.round(parseFloat(r.pct_on_time)):null;
+      stores[k].atrasados=parseInt(r.fuera_franja)||0;
+    }
+  });
+  factData.forEach(r=>{ const k=String(r.numero_tienda); if(stores[k]) stores[k].facturado=(parseFloat(r.facturado_hoy)||0); });
+
+  window._stores=stores;
+  const storeList=Object.values(stores);
+
+  const filtered=storeList.filter(s=>{
+    // Filtro por estado
+    if(activeFilter==='attention' && !(s.atrasados>0||Object.keys(s.statuses).some(c=>STATUS_MAP[c]?.group==='attention'))) return false;
+    if(activeFilter==='pendientes' && !(s.pendientes>0)) return false;
+    if(activeFilter==='picking' && !Object.keys(s.statuses).some(c=>PICKING_GROUPS.includes(STATUS_MAP[c]?.group))) return false;
+    if(activeFilter==='delivered' && !Object.keys(s.statuses).some(c=>STATUS_MAP[c]?.group==='delivered')) return false;
+    if(activeFilter==='reclamos' && !(s.reclamos>0)) return false;
+    // Filtro por coordinador
+    if(activeCoord!=='all' && s.coord!==activeCoord) return false;
+    // Filtro por formato
+    if(activeFormato!=='all' && s.formato!==activeFormato) return false;
+    return true;
+  }).sort((a,b)=>{
+    if(activeFilter==='pendientes') return b.pendientes-a.pendientes;
+    if(activeFilter==='attention') return b.atrasados-a.atrasados;
+    const totalA=Object.values(a.statuses).reduce((x,y)=>x+y,0);
+    const totalB=Object.values(b.statuses).reduce((x,y)=>x+y,0);
+    return totalB-totalA;
+  });
+
+  // En vista formato, ocultar filtro de formato (ya agrupa por formato)
+  // En vista coord, ocultar filtro de coord
+  const showFormatoFilter = activeView !== 'formato';
+  const showCoordFilter = activeView !== 'coord';
+  document.getElementById('filterRow').innerHTML=`
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%;">
+      <div class="filter-group">
+        <span class="filter-label">Ver</span>
+        <select class="filter-select" onchange="setView(this.value)">
+          <option value="formato" ${activeView==='formato'?'selected':''}>Por formato</option>
+          <option value="coord" ${activeView==='coord'?'selected':''}>Por coordinador</option>
+          <option value="tiendas" ${activeView==='tiendas'?'selected':''}>Por tienda</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Estado</span>
+        <select class="filter-select" onchange="setFilter(this.value)">
+          <option value="all" ${activeFilter==='all'?'selected':''}>Todas</option>
+          <option value="attention" ${activeFilter==='attention'?'selected':''}>🔴 Atrasados</option>
+          <option value="pendientes" ${activeFilter==='pendientes'?'selected':''}>📦 Pendientes</option>
+          <option value="reclamos" ${activeFilter==='reclamos'?'selected':''}>📋 Reclamos</option>
+          <option value="delivered" ${activeFilter==='delivered'?'selected':''}>✅ Entregados</option>
+        </select>
+      </div>
+      ${showFormatoFilter ? `<div class="filter-group">
+        <span class="filter-label">Formato</span>
+        <select class="filter-select" onchange="setFormato(this.value)">
+          <option value="all" ${activeFormato==='all'?'selected':''}>Todos</option>
+          <option value="Full 1" ${activeFormato==='Full 1'?'selected':''}>Full 1</option>
+          <option value="Full 2" ${activeFormato==='Full 2'?'selected':''}>Full 2</option>
+          <option value="GM" ${activeFormato==='GM'?'selected':''}>GM</option>
+        </select>
+      </div>` : ''}
+      ${showCoordFilter ? `<div class="filter-group">
+        <span class="filter-label">Coord.</span>
+        <select class="filter-select" onchange="setCoord(this.value)">
+          <option value="all" ${activeCoord==='all'?'selected':''}>Todos</option>
+          <option value="German" ${activeCoord==='German'?'selected':''}>German</option>
+          <option value="Nicolas" ${activeCoord==='Nicolas'?'selected':''}>Nicolas</option>
+          <option value="Pedro" ${activeCoord==='Pedro'?'selected':''}>Pedro</option>
+        </select>
+      </div>` : ''}
+    </div>`;
+
+  const resumenEl=document.getElementById('resumenPanel');
+  const gridEl=document.getElementById('storeGrid');
+  if(activeView==='formato'||activeView==='coord'){
+    document.getElementById('storeCount').textContent=`${filtered.length} tiendas · vista agrupada`;
+    if(resumenEl){ resumenEl.style.display=''; resumenEl.innerHTML=renderResumen(filtered, activeView); }
+    if(gridEl) gridEl.innerHTML='';
+    return;
+  } else {
+    if(resumenEl) resumenEl.style.display='none';
+  }
+  document.getElementById('storeCount').textContent=`${filtered.length} tiendas`;
+
+  document.getElementById('storeGrid').innerHTML=filtered.map(s=>{
+    // ON TIME: usar dato del CSV si esta disponible, sino null
+    const ontimePct=s.ontime!==null&&s.ontime!==undefined?Math.round(s.ontime):null;
+    const semColor=ontimePct===null?'none':ontimePct>=98?'green':ontimePct>=92?'yellow':'red';
+    const hasRed=semColor==='red';
+    const hasYellow=semColor==='yellow';
+    const hasGreen=semColor==='green';
+    const ontimeColor=semColor==='green'?'var(--green)':semColor==='yellow'?'var(--yellow)':semColor==='red'?'var(--red)':'var(--muted)';
+    const total=Object.values(s.statuses).reduce((a,b)=>a+b,0);
+    const ontimeHTML=ontimePct!==null?`
+      <div class="ontime-bar">
+        <div class="ontime-header">
+          <span class="ontime-label">On Time Prep.</span>
+          <span class="ontime-pct" style="color:${ontimeColor}">${ontimePct}%</span>
+        </div>
+        <div class="ontime-track"><div class="ontime-fill" style="width:${ontimePct}%;background:${ontimeColor}"></div></div>
+      </div>`:'';
+
+    // Badge pendientes en card
+    const pendienteHTML=s.pendientes>0
+      ?`<div class="card-pending"><span class="card-pending-label">📦 Pendientes</span><span class="card-pending-val">${s.pendientes}</span></div>`
+      :'';
+
+    const stats=Object.entries(s.statuses).map(([code,cnt])=>{
+      const st=STATUS_MAP[code]||{label:code,color:'dim'};
+      return `<div class="cstat clickable" onclick="drillByStatus('${s.num}','${code}','${st.label}')"><div class="cstat-l">${st.label}</div><div class="cstat-v ${st.color}">${cnt}</div></div>`;
+    }).join('');
+
+    const alertTag=s.atrasados>0?`<div class="alert-tag">⚠ ${s.atrasados} ped. fuera de franja</div>`:'';
+    const recTag=s.reclamos>0?`<div class="cstat clickable" style="grid-column:1" onclick="drillReclamos('${s.num}')"><div class="cstat-l">📋 Reclamos</div><div class="cstat-v red">${s.reclamos}</div></div>`:''; 
+    const faltTag=s.faltantes>0?`<div class="falt-tag">⚠ ${s.pedFalt} ped. con faltantes · ${s.faltantes} items</div>`:'';
+
+    // Venta total + facturado
+    const ventaTotal=s.monto>0?`<div class="cstat"><div class="cstat-l">Venta día</div><div class="cstat-v blue">${fmt$(s.monto)}</div></div>`:'';
+    const facturadoHTML=s.facturado>0?`<div class="cstat"><div class="cstat-l">Facturado</div><div class="cstat-v green">${fmt$(s.facturado)}</div></div>`:'';
+    const canceladoMontoHTML=s.monto_cancelado>0?`<div class="cstat"><div class="cstat-l">$ Cancelado</div><div class="cstat-v red">${fmt$(s.monto_cancelado)}</div></div>`:'';
+
+    // Tipos de entrega
+    const tipoEntregaHTML=`
+      ${s.delivery>0?`<div class="cstat"><div class="cstat-l">🚚 Delivery</div><div class="cstat-v white">${s.delivery}</div></div>`:''}
+      ${s.store_pickup>0?`<div class="cstat"><div class="cstat-l">🏪 Retiro</div><div class="cstat-v white">${s.store_pickup}</div></div>`:''}
+      ${s.drive_through>0?`<div class="cstat"><div class="cstat-l">🚗 Drive</div><div class="cstat-v white">${s.drive_through}</div></div>`:''}
+    `;
+
+    return `<div class="store-card ${hasRed?'alert':hasYellow?'alert-yellow':hasGreen?'alert-green':''}">
+      <div class="card-top">
+        <div class="semaforo-mini">
+          <div class="light-mini ${hasRed?'on-red':''}"></div>
+          <div class="light-mini ${hasYellow?'on-yellow':''}"></div>
+          <div class="light-mini ${hasGreen?'on-green':''}"></div>
+        </div>
+        <div class="card-info">
+          <div class="card-name">${s.name}</div>
+          <div class="card-num">#${s.num} · <span>${total} ped.</span> <span style="color:var(--muted);font-size:9px">· ${s.coord} · ${s.formato}</span></div>
+          ${pendienteHTML}
+          ${ontimeHTML}
+        </div>
+      </div>
+      <div class="card-stats">
+        ${stats}
+        ${ventaTotal}${facturadoHTML}${canceladoMontoHTML}
+        ${tipoEntregaHTML}
+        ${recTag}${alertTag}${faltTag}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderReclamos(){
+  const soloReclamos=rmaData.filter(r=>!SOLICITUDES.has(r.motivo));
+  if(!soloReclamos.length){
+    document.getElementById('recContent').innerHTML='<div class="empty"><div class="empty-icon">📋</div><div>Sin reclamos</div></div>';
+    return;
+  }
+  const byCausa={};
+  soloReclamos.forEach(r=>{ const m=r.motivo||'Sin motivo'; byCausa[m]=(byCausa[m]||0)+(parseInt(r.cantidad)||0); });
+  const totalRec=Object.values(byCausa).reduce((a,b)=>a+b,0);
+  const chipsHTML=Object.entries(byCausa).sort((a,b)=>b[1]-a[1]).map(([motivo,cnt])=>`<div class="rec-chip"><div class="rec-chip-cnt">${cnt}</div><div class="rec-chip-motivo">${motivo}</div></div>`).join('');
+  const byStore={};
+  soloReclamos.forEach(r=>{
+    const k=String(r.numero_tienda);
+    const tm=TIENDAS_MAP[k]||{};
+    if(!byStore[k]) byStore[k]={name:(r.tienda||k).replace(/^Sucursal /i,''),num:k,items:[],total:0,coord:tm.coord||'—',formato:tm.formato||'—'};
+    const qty=parseInt(r.cantidad)||0;
+    byStore[k].items.push({motivo:r.motivo||'Sin motivo',cantidad:qty});
+    byStore[k].total+=qty;
+  });
+  const storeCardsHTML=Object.values(byStore).sort((a,b)=>b.total-a.total).map((s,i)=>{
+    const uid='rec_'+i;
+    const tagsHTML=s.items.sort((a,b)=>b.cantidad-a.cantidad).map(m=>`<div class="rec-store-item"><span class="rec-store-motivo">${m.motivo}</span><span class="rec-store-qty">${m.cantidad}</span></div>`).join('');
+    return `<div class="rec-store-card">
+      <div class="rec-store-summary" onclick="toggleRecCard('${uid}')">
+        <div style="display:flex;align-items:center;gap:6px;min-width:0">
+          <span class="rec-store-name">${s.name}</span><span class="rec-store-num">#${s.num}</span>
+          <span class="rec-store-badge coord">${s.coord}</span><span class="rec-store-badge fmt">${s.formato}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span class="rec-store-total">${s.total}</span>
+          <span class="rec-store-chevron" id="chev_${uid}">▼</span>
+        </div>
+      </div>
+      <div class="rec-store-detail" id="${uid}"><div class="rec-store-items">${tagsHTML}</div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('recContent').innerHTML=`
+    <div class="rec-section-title">📊 Resumen por casuística · ${totalRec} reclamos totales</div>
+    <div class="rec-summary">${chipsHTML}</div>
+    <div class="rec-section-title">📋 Detalle por tienda</div>
+    <div class="rec-store-grid">${storeCardsHTML}</div>`;
+}
+
+function toggleRecCard(uid){
+  const det=document.getElementById(uid); const chev=document.getElementById('chev_'+uid);
+  if(!det) return; const open=det.classList.toggle('open'); if(chev) chev.classList.toggle('open',open);
+}
+function setView(v){ activeView=v; renderStores(); }
+
+function renderResumen(storeList, groupKey){
+  const STATUS_GROUPS_RES={
+    new:'new',validatingPayments:'new',
+    candidatesConfirmationDeadlineExceeded:'attention',needsIntervention:'attention',needsRescheduling:'attention',needsRepacking:'attention',pickingRejected:'attention',
+    readyForPicking:'picking',readyToProcessPicking:'picking',
+    picking:'inpicking',pendingCompletePicking:'inpicking',inPostPickingAudit:'inpicking',picked:'inpicking',pendingCandidatesConfirmation:'inpicking',
+    readyForInvoice:'invoice',
+    readyForDelivery:'ready',readyForInternalDistribution:'ready',preparingInternalDistribution:'ready',
+    inDelivery:'delivery',fulfillingInternalDistribution:'delivery',
+    delivered:'delivered',
+    canceled:'canceled',notDelivered:'canceled',cancelationRequested:'canceled'
+  };
+  const groups={};
+  // Guardar qué tiendas pertenecen a cada grupo para drill down
+  const groupStores={};
+  storeList.forEach(s=>{
+    const gk = groupKey==='formato' ? s.formato : s.coord;
+    if(!gk) return;
+    if(!groups[gk]) groups[gk]={
+      label:gk, tiendas:0, pedidos:0, atrasados:0,
+      pendientes:0, inpicking:0, invoice:0, ready:0,
+      delivered:0, canceled:0, attention:0,
+      facturado:0, monto:0, monto_cancelado:0,
+      reclamos:0, faltantes:0, pedFalt:0,
+      delivery_cnt:0, store_pickup:0, drive_through:0,
+      ontime_at:0, ontime_ff:0
+    };
+    if(!groupStores[gk]) groupStores[gk]=[];
+    groupStores[gk].push(s.num);
+    const g=groups[gk];
+    g.tiendas++;
+    g.pedidos+=Object.values(s.statuses).reduce((a,b)=>a+b,0);
+    g.atrasados+=s.atrasados||0;
+    g.pendientes+=s.pendientes||0;
+    g.delivered+=(s.statuses['delivered']||0);
+    g.canceled+=((s.statuses['canceled']||0)+(s.statuses['cancelationRequested']||0)+(s.statuses['notDelivered']||0));
+    Object.entries(s.statuses).forEach(([code,cnt])=>{
+      const grp=STATUS_GROUPS_RES[code];
+      if(grp==='inpicking') g.inpicking+=cnt;
+      if(grp==='invoice') g.invoice+=cnt;
+      if(grp==='ready'||grp==='delivery') g.ready+=cnt;
+      if(grp==='attention') g.attention+=cnt;
+    });
+    g.facturado+=(s.facturado||0);
+    g.monto+=(s.monto||0);
+    g.monto_cancelado+=(s.monto_cancelado||0);
+    g.reclamos+=(s.reclamos||0);
+    g.faltantes+=(s.faltantes||0);
+    g.pedFalt+=(s.pedFalt||0);
+    g.delivery_cnt+=(s.delivery||0);
+    g.store_pickup+=(s.store_pickup||0);
+    g.drive_through+=(s.drive_through||0);
+    if(s.ontime!=null){
+      const ot=ontimeData.find(r=>String(r.numero_tienda)===String(s.num));
+      if(ot){ g.ontime_at+=(parseInt(ot.a_tiempo)||0); g.ontime_ff+=(parseInt(ot.fuera_franja)||0); }
+    }
+  });
+  const order=groupKey==='formato'?['Full 1','Full 2','GM']:['German','Nicolas','Pedro'];
+  const f$=n=>n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(0)+'K':'$'+Math.round(n);
+
+  // Función drill down para grupos
+  window._groupStores=groupStores;
+  window._drillGroup=(gk, label, statusGroup)=>{
+    const nums=window._groupStores[gk]||[];
+    const STATUSES_FOR_GROUP={
+      inpicking:['picking','pendingCompletePicking','inPostPickingAudit','picked','pendingCandidatesConfirmation'],
+      invoice:['readyForInvoice'],
+      ready:['readyForDelivery','readyForInternalDistribution','preparingInternalDistribution','inDelivery','fulfillingInternalDistribution'],
+      delivered:['delivered'],
+      canceled:['canceled','cancelationRequested','notDelivered'],
+      attention:['candidatesConfirmationDeadlineExceeded','needsIntervention','needsRescheduling','needsRepacking']
+    };
+    const validCodes=STATUSES_FOR_GROUP[statusGroup]||[];
+    const peds=pedData.filter(p=>{
+      const num=String(p.numero_tienda||'').trim();
+      return nums.includes(num) && (statusGroup==='all'||validCodes.includes(p.status_code));
+    });
+    openDrill(`${label} — ${gk}`, `${peds.length} pedidos`, peds);
+  };
+
+  const rows=order.filter(k=>groups[k]).map(k=>{
+    const g=groups[k];
+    const base=g.ontime_at+g.ontime_ff;
+    const pct=base>0?Math.round(g.ontime_at/base*100):null;
+    const semColor=pct===null?'none':pct>=98?'green':pct>=92?'yellow':'red';
+    const pctColor=semColor==='green'?'var(--green)':semColor==='yellow'?'var(--yellow)':'var(--red)';
+    const hasRed=semColor==='red';const hasYellow=semColor==='yellow';const hasGreen=semColor==='green';
+    const ek=k.replace(/'/g,"\\'");
+    return `<div class="store-card ${hasRed?'alert':hasYellow?'alert-yellow':hasGreen?'alert-green':''}">
+      <div class="card-top">
+        <div class="semaforo-mini">
+          <div class="light-mini ${hasRed?'on-red':''}"></div>
+          <div class="light-mini ${hasYellow?'on-yellow':''}"></div>
+          <div class="light-mini ${hasGreen?'on-green':''}"></div>
+        </div>
+        <div class="card-info" style="flex:1">
+          <div class="card-name" style="font-size:15px;font-weight:800;color:var(--text)!important">${k}</div>
+          <div class="card-num" style="color:var(--text)!important;font-size:12px">${g.tiendas} tiendas · <span style="color:var(--text)!important;font-weight:700">${g.pedidos} ped.</span></div>
+          ${g.pendientes>0?`<div class="card-pending" style="margin-top:4px"><span class="card-pending-label">📦 Pendientes</span><span class="card-pending-val">${g.pendientes}</span></div>`:''}
+          ${pct!==null?`<div class="ontime-bar" style="margin-top:6px"><div class="ontime-header"><span class="ontime-label" style="color:var(--text)!important;font-weight:700">On Time Prep.</span><span class="ontime-pct" style="color:${pctColor};font-size:14px;font-weight:800">${pct}%</span></div><div class="ontime-track"><div class="ontime-fill" style="width:${pct}%;background:${pctColor}"></div></div></div>`:''}
+        </div>
+      </div>
+      <div class="card-stats">
+        ${g.inpicking>0?`<div class="cstat clickable" onclick="window._drillGroup('${ek}','Picking','inpicking')"><div class="cstat-l">Picking</div><div class="cstat-v yellow">${g.inpicking}</div></div>`:''}
+        ${g.invoice>0?`<div class="cstat clickable" onclick="window._drillGroup('${ek}','P.Facturar','invoice')"><div class="cstat-l">P.Facturar</div><div class="cstat-v blue">${g.invoice}</div></div>`:''}
+        ${g.ready>0?`<div class="cstat clickable" onclick="window._drillGroup('${ek}','P.Entregar','ready')"><div class="cstat-l">P.Entregar</div><div class="cstat-v orange">${g.ready}</div></div>`:''}
+        <div class="cstat clickable" onclick="window._drillGroup('${ek}','Entregado','delivered')"><div class="cstat-l">Entregado</div><div class="cstat-v green">${g.delivered}</div></div>
+        ${g.canceled>0?`<div class="cstat clickable" onclick="window._drillGroup('${ek}','Cancelado','canceled')"><div class="cstat-l">Cancelado</div><div class="cstat-v red">${g.canceled}</div></div>`:''}
+        ${g.attention>0?`<div class="cstat clickable" onclick="window._drillGroup('${ek}','Atención','attention')"><div class="cstat-l">Atención</div><div class="cstat-v red">${g.attention}</div></div>`:''}
+        <div class="cstat"><div class="cstat-l">Venta día</div><div class="cstat-v blue">${f$(g.monto)}</div></div>
+        ${g.facturado>0?`<div class="cstat"><div class="cstat-l">Facturado</div><div class="cstat-v green">${f$(g.facturado)}</div></div>`:''}
+        ${g.monto_cancelado>0?`<div class="cstat"><div class="cstat-l">$ Cancelado</div><div class="cstat-v red">${f$(g.monto_cancelado)}</div></div>`:''}
+        ${g.delivery_cnt>0?`<div class="cstat"><div class="cstat-l">🚚 Delivery</div><div class="cstat-v white">${g.delivery_cnt}</div></div>`:''}
+        ${g.store_pickup>0?`<div class="cstat"><div class="cstat-l">🏪 Retiro</div><div class="cstat-v white">${g.store_pickup}</div></div>`:''}
+        ${g.drive_through>0?`<div class="cstat"><div class="cstat-l">🚗 Drive</div><div class="cstat-v white">${g.drive_through}</div></div>`:''}
+        ${g.reclamos>0?`<div class="cstat"><div class="cstat-l">📋 Reclamos</div><div class="cstat-v red">${g.reclamos}</div></div>`:''}
+        ${g.faltantes>0?`<div class="falt-tag">⚠ ${g.pedFalt} ped. con faltantes · ${g.faltantes} items</div>`:''}
+        ${g.atrasados>0?`<div class="alert-tag">⚠ ${g.atrasados} ped. fuera de franja</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="store-grid" style="margin-top:8px">${rows}</div>`;
+}
+
+function clearManualRma(){
+  window._rmaManual=false; rmaData=[];
+  const b=document.getElementById('rmaManualBadge'); if(b) b.style.display='none';
+  const inp=document.getElementById('rmaInput'); if(inp) inp.value='';
+  fetchAndUpdate();
+}
+function clearManualFalt(){
+  window._faltManual=false; faltData=[]; window._faltPorTienda={};
+  const b=document.getElementById('faltManualBadge'); if(b) b.style.display='none';
+  const inp=document.getElementById('faltInput'); if(inp) inp.value='';
+  fetchAndUpdate();
+}
+function updateManualBadges(){
+  const rb=document.getElementById('rmaManualBadge'); const fb=document.getElementById('faltManualBadge');
+  if(rb) rb.style.display=window._rmaManual?'inline':'none';
+  if(fb) fb.style.display=window._faltManual?'inline':'none';
+}
+
+// Motivos que son solicitudes, no reclamos reales
+// Motivos que NO son reclamos operativos (se excluyen del conteo)
+const SOLICITUDES=new Set([
+  '3ro autorizado','Tercero autorizado','3ro Autorizado','Tercero Autorizado',
+  'Cambio de dirección','Cambio de Dirección','Cambio horario','Cambio de horario',
+  'Consulta','Información','Solicitud de información',
+  'Site to Store','Ticket mostrador',
+  'Anulación o botón de arrepentimiento','Anulacion o boton de arrepentimiento'
+]);
+
+// DRILL DOWN MODAL
+function openDrill(titulo, subtitulo, pedidos){
+  document.getElementById('drillTitle').textContent=titulo;
+  document.getElementById('drillSubtitle').textContent=subtitulo;
+  const tbody=document.getElementById('drillBody');
+  if(!pedidos||pedidos.length===0){
+    tbody.innerHTML=`<tr><td colspan="4" class="modal-empty">Sin pedidos para mostrar</td></tr>`;
+  } else {
+    const fmt$=n=>n>=1000000?'$'+(n/1000000).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(0)+'K':'$'+Math.round(n);
+    tbody.innerHTML=pedidos.map(p=>`<tr>
+      <td style="font-family:'DM Mono',monospace;color:var(--blue)">${p.order_id||'—'}</td>
+      <td style="color:var(--text)">${p.nombre_tienda||p.numero_tienda||'—'}</td>
+      <td style="color:var(--muted)">${p.shipping_type==='delivery'?'🚚 Delivery':p.shipping_type==='store_pickup'?'🏪 Retiro':p.shipping_type==='drive_through'?'🚗 Drive':p.shipping_type||'—'}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace;color:var(--green)">${fmt$(parseFloat(p.total_amount)||0)}</td>
+    </tr>`).join('');
+  }
+  document.getElementById('drillModal').style.display='flex';
+}
+function closeDrill(){ document.getElementById('drillModal').style.display='none'; }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrill(); });
+
+function drillReclamos(tiendaNum){
+  const recList=rmaData.filter(r=>String(r.numero_tienda)===String(tiendaNum));
+  const tienda=Object.values(window._stores||{}).find(s=>s.num===String(tiendaNum));
+  const nombre=tienda?.name||('Tienda '+tiendaNum);
+  if(!recList.length){ return; }
+  const h={'Access-Control-Allow-Origin':'*'};
+  // Mostrar en modal como tabla de reclamos
+  document.getElementById('drillTitle').textContent=`📋 Reclamos — ${nombre}`;
+  document.getElementById('drillSubtitle').textContent=`${recList.length} tipos · ${recList.reduce((a,r)=>a+(parseInt(r.cantidad)||0),0)} total`;
+  const tbody=document.getElementById('drillBody');
+  tbody.innerHTML=recList.map(r=>`<tr>
+    <td style="color:var(--text);font-weight:600" colspan="2">${r.motivo||'—'}</td>
+    <td style="color:var(--muted)">${r.tienda||'—'}</td>
+    <td style="text-align:right;font-family:'DM Mono',monospace;color:var(--red);font-weight:700">${parseInt(r.cantidad)||0}</td>
+    <td></td>
+  </tr>`).join('');
+  // Cambiar header
+  const thead=document.querySelector('#drillModal thead tr');
+  if(thead) thead.innerHTML='<th colspan="2">Motivo</th><th>Tienda</th><th style="text-align:right">Cant.</th><th></th>';
+  document.getElementById('drillModal').style.display='flex';
+}
+
+// Al cerrar modal, restaurar header original
+const _origClose=window.closeDrill;
+function closeDrill(){
+  document.getElementById('drillModal').style.display='none';
+  const thead=document.querySelector('#drillModal thead tr');
+  if(thead) thead.innerHTML='<th>Pedido</th><th>Tienda</th><th>Transportadora</th><th style="text-align:right">Monto</th>';
+}
+
+function drillByStatus(tiendaNum, statusCode, label){
+  const peds=pedData.filter(p=>{
+    const num=String(p.numero_tienda||'').trim();
+    return num===String(tiendaNum) && p.status_code===statusCode;
+  });
+  const tienda=peds[0]?.nombre_tienda||('Tienda '+tiendaNum);
+  openDrill(`${label} — ${tienda}`, `${peds.length} pedidos`, peds);
+}
+
+function drillByGroup(tiendaNum, group, label){
+  const STATUSES={
+    new:['new','validatingPayments'],
+    picking:['readyForPicking','readyToProcessPicking'],
+    inpicking:['picking','pendingCompletePicking','inPostPickingAudit','picked','pendingCandidatesConfirmation'],
+    invoice:['readyForInvoice'],
+    ready:['readyForDelivery','readyForInternalDistribution','preparingInternalDistribution','inDelivery','fulfillingInternalDistribution'],
+    delivered:['delivered'],
+    canceled:['canceled','cancelationRequested','notDelivered'],
+    attention:['candidatesConfirmationDeadlineExceeded','needsIntervention','needsRescheduling','needsRepacking']
+  };
+  const validCodes=STATUSES[group]||[];
+  const peds=pedData.filter(p=>{
+    const num=String(p.numero_tienda||'').trim();
+    return num===String(tiendaNum) && validCodes.includes(p.status_code);
+  });
+  const tienda=peds[0]?.nombre_tienda||('Tienda '+tiendaNum);
+  openDrill(`${label} — ${tienda}`, `${peds.length} pedidos`, peds);
+}
+
+
+</script>
+
+
+</body></html>
