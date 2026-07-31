@@ -533,48 +533,38 @@ function makeQueries(fecha){
   const F=c=>`toDate(toTimezone(${c},'America/Argentina/Buenos_Aires'))`;
   const EXCLUIR=`o.order_commerce_id NOT LIKE 'ORD-%'`;
   return {
-    // Sin JOIN - usa warehouse_id directamente, el HTML convierte a numero_tienda
-    principal:`SELECT
-      o.shipping_warehouse_id AS wh_id,
-      o.status_code,
-      o.shipping_type,
+    principal:`SELECT o.shipping_warehouse_id AS wh_id, o.status_code, o.shipping_type,
       countIf(o.order_commerce_id NOT LIKE '%-RMA') AS cantidad,
       sumIf(o.total_amount, o.order_commerce_id NOT LIKE '%-RMA') AS monto_total,
       countIf(o.order_commerce_id LIKE '%-RMA') AS cantidad_rma,
-      countIf(o.order_commerce_id NOT LIKE '%-RMA'
+      countIf(o.order_commerce_id NOT LIKE '%-RMA' AND o.delivery_sla_start<=now()
         AND o.status_code IN ('readyForInvoice','invoiced','readyForDelivery','inDelivery','delivered',
-          'readyForInternalDistribution','fulfillingInternalDistribution','preparingInternalDistribution')
-        AND o.delivery_sla_start<=now()) AS a_tiempo,
-      countIf(o.order_commerce_id NOT LIKE '%-RMA'
+        'readyForInternalDistribution','fulfillingInternalDistribution','preparingInternalDistribution')) AS a_tiempo,
+      countIf(o.order_commerce_id NOT LIKE '%-RMA' AND o.delivery_sla_start<=now()
         AND o.status_code IN ('validatingPayments','pendingCandidatesConfirmation',
-          'candidatesConfirmationDeadlineExceeded','readyForPicking','readyToProcessPicking',
-          'picking','handling','needsRepacking','needsRescheduling')
-        AND o.delivery_sla_start<=now()) AS fuera_franja,
+        'candidatesConfirmationDeadlineExceeded','readyForPicking','readyToProcessPicking',
+        'picking','handling','needsRepacking','needsRescheduling')) AS fuera_franja,
       sumIf(o.total_amount, o.order_commerce_id NOT LIKE '%-RMA'
         AND o.status_code IN ('readyForDelivery','inDelivery','fulfillingInternalDistribution',
-          'readyForInvoice','invoiced','delivered','handling','needsRepacking',
-          'readyForInternalDistribution','preparingInternalDistribution')) AS facturado
+        'readyForInvoice','invoiced','delivered','handling','needsRepacking',
+        'readyForInternalDistribution','preparingInternalDistribution')) AS facturado
       FROM orders o
       WHERE ${F('o.delivery_sla_start')}=${HOY} AND ${EXCLUIR}
       GROUP BY o.shipping_warehouse_id, o.status_code, o.shipping_type
       SETTINGS max_execution_time=25 FORMAT JSON`,
-
     warehouses:`SELECT warehouse_id, reference_id AS numero_tienda, warehouse_name AS nombre_tienda
-      FROM warehouses FORMAT JSON`,
-
+      FROM warehouses SETTINGS max_execution_time=10 FORMAT JSON`,
     faltantes:`SELECT o.shipping_warehouse_id AS wh_id,
       count(DISTINCT i.order_id) AS pedidos_faltantes,
       count(DISTINCT i.reference_id) AS items_faltantes
       FROM order_items i INNER JOIN orders o ON i.order_id=o.order_id
-      WHERE ${F('o.delivery_sla_start')}=${HOY}
-      AND i.is_picked=false AND i.is_removed=false
+      WHERE ${F('o.delivery_sla_start')}=${HOY} AND i.is_picked=false AND i.is_removed=false
       AND i.selling_measurement_unit NOT IN ('kg','g','gr','lt','l','ml')
       AND ${EXCLUIR} GROUP BY o.shipping_warehouse_id
       SETTINGS max_execution_time=25 FORMAT JSON`,
-
     pedidos:`SELECT o.order_id, o.order_commerce_id, o.status_code, o.shipping_type,
-      o.shipping_warehouse_id AS wh_id,
-      o.total_amount, o.order_commerce_id LIKE '%-RMA' AS es_rma
+      o.shipping_warehouse_id AS wh_id, o.total_amount,
+      o.order_commerce_id LIKE '%-RMA' AS es_rma
       FROM orders o
       WHERE ${F('o.delivery_sla_start')}=${HOY} AND ${EXCLUIR}
       SETTINGS max_execution_time=25 FORMAT JSON`,
@@ -707,39 +697,29 @@ async function fetchAndUpdate(){
     const fecha=getArgentinaDate();
     const Q=makeQueries(fecha);
     const safe=async(sql,label)=>{try{return await qCH(sql);}catch(e){console.error('[CH]',label,e.message);return[];}};
-    // Cargar warehouses primero para hacer el mapeo wh_id → numero_tienda
-    const [principal, whData, faltantesRaw]=await Promise.all([
+    const [principal,whData,faltantesRaw]=await Promise.all([
       safe(Q.principal,'principal'),
       safe(Q.warehouses,'warehouses'),
       safe(Q.faltantes,'faltantes')
     ]);
 
-    // Construir mapa warehouse_id → {numero_tienda, nombre_tienda}
+    // Mapa warehouse_id → {num, nombre}
     const whMap={};
-    whData.forEach(w=>{ whMap[w.warehouse_id]={num:String(w.numero_tienda||''),nombre:w.nombre_tienda||''}; });
+    whData.forEach(w=>{whMap[String(w.warehouse_id)]={num:String(w.numero_tienda||''),nombre:w.nombre_tienda||''};});
 
-    // Expandir principal usando whMap
-    const pedidos=[], tiposMap={}, ontimeMap={}, facturacionMap={};
+    // Expandir principal
+    const pedidos=[],tiposMap={},ontimeMap={},facturacionMap={};
     principal.forEach(r=>{
-      const wh=whMap[r.wh_id]||{num:'',nombre:''};
-      const num=wh.num||r.wh_id;
-      const nombre=wh.nombre;
+      const wh=whMap[String(r.wh_id)]||{num:String(r.wh_id),nombre:''};
+      const num=wh.num; const nombre=wh.nombre;
       const cnt=parseInt(r.cantidad)||0;
-      const montoUnit=cnt>0?(parseFloat(r.monto_total)||0)/cnt:0;
-      for(let i=0;i<cnt;i++) pedidos.push({
-        order_id:'',order_commerce_id:'',status_code:r.status_code,
-        shipping_type:r.shipping_type||'',numero_tienda:num,
-        nombre_tienda:nombre,total_amount:montoUnit,es_rma:false
-      });
-      const cntRma=parseInt(r.cantidad_rma)||0;
-      for(let i=0;i<cntRma;i++) pedidos.push({
-        order_id:'',order_commerce_id:'',status_code:r.status_code,
-        shipping_type:r.shipping_type||'',numero_tienda:num,
-        nombre_tienda:nombre,total_amount:0,es_rma:true
-      });
-      const tkey=num+'|'+r.shipping_type;
-      if(!tiposMap[tkey]) tiposMap[tkey]={numero_tienda:num,shipping_type:r.shipping_type,cantidad:0};
-      tiposMap[tkey].cantidad+=cnt;
+      const mu=cnt>0?(parseFloat(r.monto_total)||0)/cnt:0;
+      for(let i=0;i<cnt;i++) pedidos.push({order_id:'',order_commerce_id:'',status_code:r.status_code,shipping_type:r.shipping_type||'',numero_tienda:num,nombre_tienda:nombre,total_amount:mu,es_rma:false});
+      const cr=parseInt(r.cantidad_rma)||0;
+      for(let i=0;i<cr;i++) pedidos.push({order_id:'',order_commerce_id:'',status_code:r.status_code,shipping_type:r.shipping_type||'',numero_tienda:num,nombre_tienda:nombre,total_amount:0,es_rma:true});
+      const tk=num+'|'+r.shipping_type;
+      if(!tiposMap[tk]) tiposMap[tk]={numero_tienda:num,shipping_type:r.shipping_type,cantidad:0};
+      tiposMap[tk].cantidad+=cnt;
       if(!ontimeMap[num]) ontimeMap[num]={numero_tienda:num,a_tiempo:0,fuera_franja:0,total_activos:0};
       ontimeMap[num].a_tiempo+=parseInt(r.a_tiempo)||0;
       ontimeMap[num].fuera_franja+=parseInt(r.fuera_franja)||0;
@@ -747,39 +727,29 @@ async function fetchAndUpdate(){
       if(!facturacionMap[num]) facturacionMap[num]={numero_tienda:num,facturado_hoy:0};
       facturacionMap[num].facturado_hoy+=parseFloat(r.facturado)||0;
     });
-
-    // Mapear faltantes
-    const faltantes=faltantesRaw.map(r=>{
-      const wh=whMap[r.wh_id]||{num:r.wh_id};
-      return {...r, numero_tienda:wh.num};
-    });
-
+    const faltantes=faltantesRaw.map(r=>({...r,numero_tienda:(whMap[String(r.wh_id)]||{num:r.wh_id}).num}));
     const tipos=Object.values(tiposMap);
     const ontime=Object.values(ontimeMap);
     const facturacion=Object.values(facturacionMap);
     const reclamos=[];
 
-    // Lazy load detalle para drill down
+    window._whMap=whMap;
     window._pedDetalleCargado=false;
     window._loadPedDetalle=async()=>{
       if(window._pedDetalleCargado) return;
       const det=await safe(makeQueries(getArgentinaDate()).pedidos,'det');
       if(det.length>0){
-        pedData=det.map(r=>({
-          order_id:r.order_id,order_commerce_id:r.order_commerce_id||'',
+        pedData=det.map(r=>({order_id:r.order_id,order_commerce_id:r.order_commerce_id||'',
           status_code:r.status_code,shipping_type:r.shipping_type||'',
-          numero_tienda:(whMap[r.wh_id]||{num:r.wh_id}).num,
-          nombre_tienda:(whMap[r.wh_id]||{nombre:''}).nombre,
+          numero_tienda:(window._whMap[String(r.wh_id)]||{num:r.wh_id}).num,
+          nombre_tienda:(window._whMap[String(r.wh_id)]||{nombre:''}).nombre,
           total_amount:parseFloat(r.total_amount)||0,
-          es_rma:r.es_rma==1||r.es_rma===true||r.es_rma==='1'
-        }));
+          es_rma:r.es_rma==1||r.es_rma===true||r.es_rma==='1'}));
         window._pedDetalleCargado=true;
       }
     };
 
-    const d={ok:true,ts:new Date().toISOString(),pedidos,faltantes,tipos,facturacion,ontime,reclamos};
-
-    pedData=pedidos;
+    pedData=pedidos.map(r=>({...r,warehouse_id:'',atrasados:0}));
 
     // faltData: solo actualizar si no fue cargado manualmente
     if(!window._faltManual){
